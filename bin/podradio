@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+use Data::Dumper;
+use LWP::UserAgent;
+use warnings;
+use strict;
+
+my $url_base = "http://www.google.com/reader/public/atom/user%2F12483683802801775802%2Flabel%2F";
+my %players = (
+  'mplayer' => 'mplayer',
+);
+my $tag = $ARGV[0] || 'podtech';
+my $url_get = $url_base . $tag;
+
+my $ua = LWP::UserAgent->new;
+my $response = $ua->get($url_get);
+my $html = $response->as_string;
+#die Dumper $html;
+
+while ($html =~ m/(http\S+\.mp3)/gi) {
+  (my $match = $&) =~ s/href=*"*//g;
+  foreach my $player (keys %players) {
+    if (`which $player`) {
+      my $syntax_player = qq($players{$player} $match);
+      print Dumper $syntax_player;
+      #system $syntax_player;
+      last;
+    }
+  }
+}
+
