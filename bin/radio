@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+use YAML;
+use strict;
+use warnings;
+
+my %formats = (
+  mandarin => [qw(
+    http://216.18.21.103:8999/radio
+  )],
+);
+print Dump \%formats;
+
+my $format = $ARGV[0] || 'mandarin';
+
+foreach my $url (@{$formats{$format}}) {
+  system("mplayer $url");
+}
