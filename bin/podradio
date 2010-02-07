@@ -1,12 +1,15 @@
 #!/usr/bin/perl
+# plays media files from a Google Reader shared feed
+# TODO YAML output;
 use Data::Dumper;
 use LWP::UserAgent;
 use warnings;
 use strict;
 
 my $url_base = "http://www.google.com/reader/public/atom/user%2F12483683802801775802%2Flabel%2F";
-my %players = (
-  'mplayer' => 'mplayer',
+my @players = (
+  'mplayer',
+  'vlc -Idummy',
 );
 my $tag = $ARGV[0] || 'podtech';
 my $url_get = $url_base . $tag;
@@ -18,13 +21,18 @@ my $html = $response->as_string;
 
 while ($html =~ m/(http\S+\.mp3)/gi) {
   (my $match = $&) =~ s/href=*"*//g;
-  foreach my $player (keys %players) {
-    if (`which $player`) {
-      my $syntax_player = qq($players{$player} $match);
+  foreach my $player (@players) {
+    my ($basename) = split '\s+', $player;
+    if (`which $basename`) {
+      print "found player: $player\n";
+      my $syntax_player = qq($player $match);
       print Dumper $syntax_player;
-      #system $syntax_player;
+      system $syntax_player;
       last;
     }
+    else {
+      print "didn't find: $player\n";
+    };
   }
 }
 
