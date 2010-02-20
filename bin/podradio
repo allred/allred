@@ -1,10 +1,14 @@
 #!/usr/bin/perl
-# plays media files from a Google Reader shared feed
-# TODO YAML output;
+# purpose : plays media files from a Google Reader shared feed
+# usage   : $0 [GoogleReaderLabel]
+# TODO:
+# - YAML output;
 use Data::Dumper;
 use LWP::UserAgent;
 use warnings;
 use strict;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Terse = 1;
 
 my $url_base = "http://www.google.com/reader/public/atom/user%2F12483683802801775802%2Flabel%2F";
 my @players = (
@@ -13,26 +17,46 @@ my @players = (
 );
 my $tag = $ARGV[0] || 'podtech';
 my $url_get = $url_base . $tag;
-
 my $ua = LWP::UserAgent->new;
-my $response = $ua->get($url_get);
-my $html = $response->as_string;
-#die Dumper $html;
 
-while ($html =~ m/(http\S+\.mp3)/gi) {
-  (my $match = $&) =~ s/href=*"*//g;
-  foreach my $player (@players) {
-    my ($basename) = split '\s+', $player;
-    if (`which $basename`) {
-      print "found player: $player\n";
-      my $syntax_player = qq($player $match);
-      print Dumper $syntax_player;
-      system $syntax_player;
-      last;
-    }
-    else {
-      print "didn't find: $player\n";
-    };
+# find an installed player
+
+my $player_found;
+foreach my $player (@players) {
+  my ($basename) = split '\s+', $player;
+  if (`which $basename`) {
+    print "found player: $player\n";
+    $player_found = $player;
+    last;
+  }
+}
+unless ($player_found) {
+  die "Unable to find player in " . Dumper \@players;
+}
+
+# iterate through audio file urls, de-dupe and play
+
+my %files_played;
+my $html = get();
+while ($html =~ m{
+  (                         # 1. URL
+    http://\S+/(\S+?\.mp3)  # 2. file 
+  )
+}xmsgi) {
+  my $file = $2;
+  unless ($file) { die "oops!  couldn't extract file name from " . Dumper $1; }
+  (my $match = $1) =~ s/href=*"*|".*//g;
+  my $syntax_player = qq($player_found $match);
+  unless ($files_played{$file}) {
+    print localtime() . ' : running ' . Dumper $syntax_player;
+    system $syntax_player;
+    $files_played{$file}++;
   }
 }
 
+# purpose  : get the URL and return the html string
+
+sub get {
+  my $response = $ua->get($url_get);
+  return $response->as_string;
+}
