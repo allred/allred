@@ -3,6 +3,7 @@
 # usage   : $0 [GoogleReaderLabel]
 # TODO:
 # - YAML output;
+
 use Data::Dumper;
 use LWP::UserAgent;
 use warnings;
@@ -14,6 +15,8 @@ my $url_base = "http://www.google.com/reader/public/atom/user%2F1248368380280177
 my @players = (
   'mplayer',
   'vlc -Idummy',
+  #'mocp',
+  #'mp3blaster',
 );
 my $tag = $ARGV[0] || 'podtech';
 my $url_get = $url_base . $tag;
@@ -45,6 +48,9 @@ while ($html =~ m{
 }xmsgi) {
   my $file = $2;
   unless ($file) { die "oops!  couldn't extract file name from " . Dumper $1; }
+
+  # get rid of extraneous html flotsam
+
   (my $match = $1) =~ s/href=*"*|".*//g;
   my $syntax_player = qq($player_found $match);
   unless ($files_played{$file}) {
