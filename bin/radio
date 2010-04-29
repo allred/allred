@@ -7,6 +7,12 @@ my %formats = (
   mandarin => [qw(
     http://216.18.21.103:8999/radio
   )],
+  nypd => [qw(
+    http://74.229.4.35:4032/listen.pls
+  )],
+  walkie => [qw(
+    http://andro-ix.com:8575
+  )],
 );
 print Dump \%formats;
 

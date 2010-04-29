@@ -1,8 +1,14 @@
 #!/usr/bin/perl
-# purpose : plays media files from a Google Reader shared feed
-# usage   : $0 [GoogleReaderLabel]
+# purpose : command line podcast player
+#           plays media files from a Google Reader public/shared feed
+# requirements:
+# - see @players for list of compatible players, add your own to the list
 # TODO:
+# - pass FF user agent string to mplayer (and vlc?) to bypass filtering
 # - YAML output;
+my $usage = <<<USAGE;
+$0 [GoogleReaderPublicLabel]
+USAGE
 
 use Data::Dumper;
 use LWP::UserAgent;
@@ -20,6 +26,7 @@ my @players = (
 );
 my $tag = $ARGV[0] || 'podtech';
 my $url_get = $url_base . $tag;
+print "playing: $url_get\n";
 my $ua = LWP::UserAgent->new;
 
 # find an installed player
