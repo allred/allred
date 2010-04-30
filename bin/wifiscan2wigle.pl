@@ -10,11 +10,7 @@
 
 use Data::Dumper;
 use Date::Parse;
-use File::Find;
-use Geo::KML;
-use Text::CSV;
 use XML::LibXML::Simple;
-use YAML;
 use strict;
 use warnings;
 
@@ -35,16 +31,10 @@ MAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,Altitu
 
 $header = $header_wigle;
 
-my $csv = Text::CSV->new({
-  sep_char => ',',
-});
-
 print $header . "\n";
 my @files_kml = glob "$dir_kml/*";
 foreach my $file (@files_kml) {
   my $ref = XMLin($file);
-  #print Dumper $ref;
-  #my ($ns, $data) = Geo::KML->read_kml($file);
   my $network = 0;
   my $placemark = $ref->{Document}->{Folder}->{Placemark};
 
@@ -65,14 +55,11 @@ foreach my $file (@files_kml) {
     die "unknown ref type: " . ref $placemark;
   }
 }
-print STDERR Dump \%stats;
+print STDERR Dumper \%stats;
 
 sub process_placemark {
   my $placemark = shift;
   my $essid = shift || $placemark->{name} || die "no name";
-  #unless (ref $placemark eq 'HASH') {
-  #  die Dumper $placemark;
-  #}
   my $coordinates = $placemark->{Point}->{coordinates};
   my $description = $placemark->{description};
   #$description =~ /
@@ -102,7 +89,6 @@ sub process_placemark {
     $day = "0$day";
   }
   my $first_seen = "$year-$month-$day $hour:$min:$sec";
-  #die Dumper $first_seen;
 
   unless ($bssid && $channel && $signal && $last_seen && $latitude && $longitude) {
     die Dumper { 
@@ -125,9 +111,4 @@ sub process_placemark {
   unless ($caps) { $caps = ''; }
   print qq($bssid,$essid,$caps,$first_seen,$channel,$signal,$latitude,$longitude,0,250\n);
   $stats{ssids_total}++;
-}
-
-sub combineprint {
-  $csv->combine(@_);
-  print $csv->string . "\n";
 }
