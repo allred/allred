@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+# purpose : prints last N tweets
+# TODO
+# - allow/encourage using openauth or similar
+
+my $usage = <<USAGE;
+
+usage:
+  $0 [--user u] [--pass p] [--loop m] [--help]
+
+where:
+  --user : is the Twitter user name
+  --pass : is the Twitter password (safer to use environment variable as below)
+  --loop : refresh every m minutes, printing new tweets
+
+example:
+  TWTUSER=scobleizer TWTPASS=overshare $0 --loop 10
+USAGE
+
+use Data::Dumper;
+use Date::Parse;
+use Encode;
+use Getopt::Long;
+use Net::Twitter;
+use strict;
+use warnings;
+
+# handle args
+
+my @options = qw(
+  help
+  loop=s
+  pass=s
+  user=s
+);
+my %args;
+GetOptions(\%args, @options);
+if ($args{help}) {
+  print "$usage\n";
+  exit 2;
+}
+my $user = $args{user} || $ENV{TWTUSER}; 
+my $pass = $args{pass} || $ENV{TWTPASS}; 
+unless ($user && $pass) {
+  print "No user/password specified!\n$usage\n";
+  exit 2;
+}
+
+my $nt = Net::Twitter->new(
+  traits => [qw(API::REST)],
+  username => $user,
+  password => $pass,
+);
+
+my $statuses;
+my $high_water = 1;
+
+while ( 1 ) {
+  eval {
+    $statuses = $nt->friends_timeline({
+      since_id => $high_water,
+      count => 20,
+    });
+  };
+  print_statuses($statuses);
+
+  if ($args{loop}) {
+    unless ($args{loop} >= 1) { $args{loop} = 1; }
+    sleep $args{loop} * 60;
+  }
+  else {
+    last;
+  }
+}
+
+# purpose : print out the array of statuses
+
+sub print_statuses {
+  my $statuses = shift;
+  unless ($statuses) {
+    return;
+  }
+  if (scalar @$statuses) {
+    my $timestamp = localtime;
+    my $length_timestamp = length $timestamp;
+    print '=' x (80  - ($length_timestamp + 1)) . ' ' . $timestamp . "\n";
+  }
+  for my $status ( reverse @$statuses ) {
+    $high_water = $status->{id};
+    my $etime;
+    eval { $etime = str2time $status->{created_at}; };
+    #my $mins_ago = sprintf('%0.1f', (time - $etime) / 60);
+    my $mins_ago = (time - $etime) / 60;
+    my $mins_ago_print = sprintf '%02.1f', "$mins_ago";
+    if ($mins_ago_print < 10) {
+      $mins_ago_print = "0" . $mins_ago_print;
+    }
+    my $screen_name = sprintf '%-13s', $status->{user}{screen_name};
+    print encode 'utf8',  "$mins_ago_print $screen_name > $status->{text}\n";
+  }
+}
