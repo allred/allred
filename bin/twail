@@ -1,20 +1,20 @@
-#!/usr/bin/env perl
-# purpose : prints last N tweets
+#!/usr/bin/perl
+# purpose : like the unix "tail" command for Twitter
 # TODO
 # - allow/encourage using openauth or similar
 
 my $usage = <<USAGE;
 
 usage:
-  $0 [--user u] [--pass p] [--loop m] [--help]
+  $0 [--user u] [--pass p] [--follow m] [--help]
 
 where:
-  --user : is the Twitter user name
-  --pass : is the Twitter password (safer to use environment variable as below)
-  --loop : refresh every m minutes, printing new tweets
+  --user   : is the Twitter user name
+  --pass   : is the Twitter password (safer to use environment variable as below)
+  --follow : refresh every m minutes, printing new tweets (ala tail -f)
 
 example:
-  TWTUSER=scobleizer TWTPASS=overshare $0 --loop 10
+  TWTUSER=scobleizer TWTPASS=overshare $0 -f 10
 USAGE
 
 use Data::Dumper;
@@ -29,7 +29,7 @@ use warnings;
 
 my @options = qw(
   help
-  loop=s
+  follow=s
   pass=s
   user=s
 );
@@ -64,9 +64,9 @@ while ( 1 ) {
   };
   print_statuses($statuses);
 
-  if ($args{loop}) {
-    unless ($args{loop} >= 1) { $args{loop} = 1; }
-    sleep $args{loop} * 60;
+  if ($args{follow}) {
+    unless ($args{follow} >= 1) { $args{follow} = 1; }
+    sleep $args{follow} * 60;
   }
   else {
     last;
