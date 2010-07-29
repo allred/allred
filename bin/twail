@@ -81,7 +81,7 @@ sub print_statuses {
     return;
   }
   if (scalar @$statuses) {
-    my $timestamp = localtime;
+    my $timestamp = '[ ' . localtime() . ' ] ===';
     my $length_timestamp = length $timestamp;
     print '=' x (80  - ($length_timestamp + 1)) . ' ' . $timestamp . "\n";
   }
