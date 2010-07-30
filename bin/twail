@@ -95,7 +95,8 @@ sub print_statuses {
     if ($mins_ago_print < 10) {
       $mins_ago_print = "0" . $mins_ago_print;
     }
-    my $screen_name = sprintf '%-13s', $status->{user}{screen_name};
-    print encode 'utf8',  "$mins_ago_print $screen_name > $status->{text}\n";
+    my $screen_name = sprintf '%-14s', $status->{user}{screen_name};
+    #print encode 'utf8',  "$mins_ago_print $screen_name > $status->{text}\n";
+    print encode 'utf8',  "$screen_name | $status->{text}\n";
   }
 }
