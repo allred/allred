@@ -1,17 +1,16 @@
 #!/usr/bin/perl
 # purpose : like the unix "tail" command for Twitter
-# TODO
-# - allow/encourage using openauth or similar
 
 my $usage = <<USAGE;
 
 usage:
-  $0 [--user u] [--pass p] [--follow m] [--help]
+  $0 [--user u] [--pass p] [--follow m] [--list l] [--help]
 
 where:
   --user   : is the Twitter user name
   --pass   : is the Twitter password (safer to use environment variable as below)
   --follow : refresh every m minutes, printing new tweets (ala tail -f)
+  --list   : print statuses from a list you own
 
 example:
   TWTUSER=scobleizer TWTPASS=overshare $0 -f 10
@@ -30,6 +29,7 @@ use warnings;
 my @options = qw(
   help
   follow=s
+  list=s
   pass=s
   user=s
 );
@@ -47,7 +47,10 @@ unless ($user && $pass) {
 }
 
 my $nt = Net::Twitter->new(
-  traits => [qw(API::REST)],
+  traits => [qw(
+    API::Lists
+    API::REST
+  )],
   username => $user,
   password => $pass,
 );
@@ -56,12 +59,37 @@ my $statuses;
 my $high_water = 1;
 
 while ( 1 ) {
-  eval {
-    $statuses = $nt->friends_timeline({
-      since_id => $high_water,
-      count => 20,
-    });
-  };
+  if ($args{list}) {
+    my $list_id;
+    my $list_data = $nt->get_lists($user);
+    my @lists_found;
+    foreach my $list (@{$list_data->{lists}}) {
+      push @lists_found, $list->{name};
+      if ($args{list} eq $list->{name}) {
+        $list_id = $list->{id};
+      }
+    }
+    unless ($list_id) {
+      print "available lists are: " . join ', ', @lists_found;
+      print "\n";
+      exit 1;
+    }
+    eval {
+      $statuses = $nt->list_statuses({
+        list_id => $list_id,
+        user => $user,
+        since_id => $high_water,
+      });
+    };
+  }
+  else {
+    eval {
+      $statuses = $nt->friends_timeline({
+        since_id => $high_water,
+        count => 20,
+      });
+    };
+  }
   print_statuses($statuses);
 
   if ($args{follow}) {
