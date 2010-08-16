@@ -4,14 +4,15 @@
 my $usage = <<USAGE;
 
 usage:
-  $0 [--user u] [--pass p] [--color] [--follow m] [--list l] [--help]
+  $0 [--user u] [--pass p] [--color] [--follow m] [--list l] [--timestamp] [--help]
 
 where:
-  --user   : is the Twitter user name
-  --pass   : is the Twitter password (safer to use environment variable as below)
-  --color  : ANSI color output
-  --follow : refresh every m minutes, printing new tweets (ala tail -f)
-  --list   : print statuses from a list you own
+  --user      : is the Twitter user name
+  --pass      : is the Twitter password (safer to use environment variable as below)
+  --color     : ANSI color output
+  --follow    : refresh every m minutes, printing new tweets (ala tail -f)
+  --list      : print statuses from a list you own
+  --timestamp : print timestamp every update
 
 example:
   TWTUSER=scobleizer TWTPASS=overshare $0 -f 10
@@ -140,7 +141,7 @@ sub print_statuses {
 
   # print timestamp/separator
 
-  if (scalar @$statuses) {
+  if (scalar @$statuses && $args{timestamp}) {
     my $timestamp = '[ ' . localtime() . ' ] ';
     my $length_timestamp = length $timestamp;
     if ($args{color}) {
