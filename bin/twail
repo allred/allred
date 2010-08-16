@@ -4,11 +4,12 @@
 my $usage = <<USAGE;
 
 usage:
-  $0 [--user u] [--pass p] [--follow m] [--list l] [--help]
+  $0 [--user u] [--pass p] [--color] [--follow m] [--list l] [--help]
 
 where:
   --user   : is the Twitter user name
   --pass   : is the Twitter password (safer to use environment variable as below)
+  --color  : ANSI color output
   --follow : refresh every m minutes, printing new tweets (ala tail -f)
   --list   : print statuses from a list you own
 
@@ -21,14 +22,16 @@ use Date::Parse;
 use Encode;
 use Getopt::Long;
 use Net::Twitter;
+use Term::ANSIColor;
 use strict;
 use warnings;
 
 # handle args
 
 my @options = qw(
-  help
+  color
   follow=s
+  help
   list=s
   pass=s
   user=s
@@ -46,6 +49,17 @@ unless ($user && $pass) {
   exit 2;
 }
 
+my $statuses;
+my $high_water = 1;
+my %name_colors;
+my @colors_foreground_screen_names = qw(
+  cyan
+  green
+  magenta
+  red
+  yellow
+);
+
 my $nt = Net::Twitter->new(
   traits => [qw(
     API::Lists
@@ -55,33 +69,44 @@ my $nt = Net::Twitter->new(
   password => $pass,
 );
 
-my $statuses;
-my $high_water = 1;
+
+# the big twail loop (if in follow mode)
 
 while ( 1 ) {
+
+  # list mode
+
   if ($args{list}) {
     my $list_id;
-    my $list_data = $nt->get_lists($user);
-    my @lists_found;
-    foreach my $list (@{$list_data->{lists}}) {
-      push @lists_found, $list->{name};
-      if ($args{list} eq $list->{name}) {
-        $list_id = $list->{id};
-      }
-    }
-    unless ($list_id) {
-      print "available lists are: " . join ', ', @lists_found;
-      print "\n";
-      exit 1;
-    }
+    my $list_data;
     eval {
-      $statuses = $nt->list_statuses({
-        list_id => $list_id,
-        user => $user,
-        since_id => $high_water,
-      });
+      $list_data = $nt->get_lists($user);
     };
+    my @lists_found;
+    if ($list_data) {
+      foreach my $list (@{$list_data->{lists}}) {
+        push @lists_found, $list->{name};
+        if ($args{list} eq $list->{name}) {
+          $list_id = $list->{id};
+        }
+      }
+      unless ($list_id) {
+        print "available lists are: " . join ', ', @lists_found;
+        print "\n";
+        exit 1;
+      }
+      eval {
+        $statuses = $nt->list_statuses({
+          list_id => $list_id,
+          user => $user,
+          since_id => $high_water,
+        });
+      };
+    }
   }
+
+# default mode: follow the user's friends' timeline
+
   else {
     eval {
       $statuses = $nt->friends_timeline({
@@ -92,6 +117,9 @@ while ( 1 ) {
   }
   print_statuses($statuses);
 
+  # if in follow mode, sleep and stay in loop
+  # otherwise, exit the loop
+
   if ($args{follow}) {
     unless ($args{follow} >= 1) { $args{follow} = 1; }
     sleep $args{follow} * 60;
@@ -101,17 +129,27 @@ while ( 1 ) {
   }
 }
 
-# purpose : print out the array of statuses
+# purpose : print out the array of statuses in a formatted log-like fashion
+# args    : $statuses_arrayref
 
 sub print_statuses {
   my $statuses = shift;
   unless ($statuses) {
     return;
   }
+
+  # print timestamp/separator
+
   if (scalar @$statuses) {
-    my $timestamp = '[ ' . localtime() . ' ] ===';
+    my $timestamp = '[ ' . localtime() . ' ] ';
     my $length_timestamp = length $timestamp;
-    print '=' x (80  - ($length_timestamp + 1)) . ' ' . $timestamp . "\n";
+    if ($args{color}) {
+      print color 'blue';
+    }
+    print ' ' x (80  - ($length_timestamp + 1)) . ' ' . $timestamp . "\n";
+    if ($args{color}) {
+      print color 'reset';
+    }
   }
   for my $status ( reverse @$statuses ) {
     $high_water = $status->{id};
@@ -123,8 +161,24 @@ sub print_statuses {
     if ($mins_ago_print < 10) {
       $mins_ago_print = "0" . $mins_ago_print;
     }
-    my $screen_name = sprintf '%-14s', $status->{user}{screen_name};
-    #print encode 'utf8',  "$mins_ago_print $screen_name > $status->{text}\n";
-    print encode 'utf8',  "$screen_name | $status->{text}\n";
+    my $name_print = $status->{user}{screen_name};
+    my $length_screen_name = length $name_print;
+    if ($args{color}) {
+      $name_colors{$name_print} ||= color($colors_foreground_screen_names[int(rand $#colors_foreground_screen_names + 1)]);
+      $name_print = $name_colors{$name_print} . $name_print . color('reset');
+    }
+    #my $screen_name = sprintf '%-14s', $name_print;
+    my $screen_name = ' ' x (14 - $length_screen_name) . $name_print;
+    print $screen_name;
+    if ($args{color}) {
+      print color('blue');
+    }
+    print " | ";
+    if ($args{color}) {
+      print color('reset');
+    }
+    print encode 'utf8',  $status->{text};
+    print "\n";
   }
 }
+
