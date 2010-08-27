@@ -31,6 +31,7 @@ use warnings;
 
 my @options = qw(
   color
+  debug
   follow=s
   help
   list=s
@@ -70,6 +71,27 @@ my $nt = Net::Twitter->new(
   password => $pass,
 );
 
+my @lists_found;
+my $list_id;
+if ($args{list}) {
+  my $list_data;
+  eval {
+    $list_data = $nt->get_lists($user);
+  };
+  if ($list_data) {
+    foreach my $list (@{$list_data->{lists}}) {
+      push @lists_found, $list->{name};
+      if ($args{list} eq $list->{name}) {
+        $list_id = $list->{id};
+      }
+    }
+    unless ($list_id) {
+      print "available lists are: " . join ', ', @lists_found;
+      print "\n";
+      exit 1;
+    }
+  }
+}
 
 # the big twail loop (if in follow mode)
 
@@ -78,43 +100,46 @@ while ( 1 ) {
   # list mode
 
   if ($args{list}) {
-    my $list_id;
-    my $list_data;
+    my $result = 'failure';
+    if ($args{debug}) {
+      my $timestamp = localtime();
+      print "$timestamp fetching list $user/$list_id ";
+    }
     eval {
-      $list_data = $nt->get_lists($user);
+      $statuses = $nt->list_statuses({
+        list_id => $list_id,
+        user => $user,
+        since_id => $high_water,
+      });
     };
-    my @lists_found;
-    if ($list_data) {
-      foreach my $list (@{$list_data->{lists}}) {
-        push @lists_found, $list->{name};
-        if ($args{list} eq $list->{name}) {
-          $list_id = $list->{id};
-        }
-      }
-      unless ($list_id) {
-        print "available lists are: " . join ', ', @lists_found;
-        print "\n";
-        exit 1;
-      }
-      eval {
-        $statuses = $nt->list_statuses({
-          list_id => $list_id,
-          user => $user,
-          since_id => $high_water,
-        });
-      };
+    unless ($@) {
+      $result = 'success';
+    }
+    if ($args{debug}) {
+      print " $result \n";
     }
   }
 
 # default mode: follow the user's friends' timeline
 
   else {
+    my $result = 'failure';
+    if ($args{debug}) {
+      my $timestamp = localtime();
+      print "$timestamp fetching timeline > $high_water ";
+    }
     eval {
       $statuses = $nt->friends_timeline({
         since_id => $high_water,
         count => 20,
       });
     };
+    unless ($@) {
+      $result = 'success';
+    }
+    if ($args{debug}) {
+      print " $result \n";
+    }
   }
   print_statuses($statuses);
 
