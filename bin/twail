@@ -75,9 +75,21 @@ my @lists_found;
 my $list_id;
 if ($args{list}) {
   my $list_data;
+  my $result = 'success';
+  if ($args{debug}) {
+    my $timestamp = localtime();
+    print "$timestamp fetching lists for user $user ";
+  }
   eval {
     $list_data = $nt->get_lists($user);
   };
+  if ($@) {
+    $result = 'failure';
+    die $@;
+  }
+  if ($args{debug}) {
+    print " $result\n";
+  }
   if ($list_data) {
     foreach my $list (@{$list_data->{lists}}) {
       push @lists_found, $list->{name};
