@@ -6,11 +6,10 @@
 my $usage = <<USAGE;
 
 usage:
-  $0 [--user u] [--pass p] [--color] [--debug] [--follow m] [--list l] [--timestamp] [--help]
+  $0 [--user u] [--color] [--debug] [--follow m] [--list l] [--timestamp] [--help]
 
 where:
   --user      : is the Twitter user name
-  --pass      : is the Twitter password (safer to use environment variable as below)
   --color     : ANSI color output
   --debug     : print some debugging output
   --follow    : refresh every m minutes, printing new tweets ala tail -f
@@ -18,15 +17,17 @@ where:
   --timestamp : print timestamp every update
 
 examples:
-  TWTUSER=scobleizer TWTPASS=overshare $0 -f 10 -c
-  TWTUSER=questzero TWTPASS=uptheirons $0 -f 1 -c -l toptwenty 
+  $0 --user scobleizer --follow 1 
+  $0 -u questzero -f .5 -c -l toptwenty 
 USAGE
 
 use Data::Dumper;
 use Date::Parse;
 use Encode;
+use FindBin;
 use Getopt::Long;
 use Net::Twitter;
+use Storable;
 use Term::ANSIColor;
 use strict;
 use warnings;
@@ -39,7 +40,6 @@ my @options = qw(
   follow=s
   help
   list=s
-  pass=s
   user=s
 );
 my %args;
@@ -49,12 +49,22 @@ if ($args{help}) {
   exit 2;
 }
 my $user = $args{user} || $ENV{TWTUSER}; 
-my $pass = $args{pass} || $ENV{TWTPASS}; 
-unless ($user && $pass) {
-  print "No user/password specified!\n$usage\n";
+unless ($user) {
+  print "No user specified!\n$usage\n";
   exit 2;
 }
 
+my $api_key = 'FJCpzTn5HvUthXtLmXTDEQ';
+my $consumer_key = 'FJCpzTn5HvUthXtLmXTDEQ';
+my $cs = ''
+  . 'F9y8Nbb3zCjvEnZv0cop8'
+  . 'jm3rvi'
+  . '5JP$\uajyGkLC.'
+;
+$cs = 'J' . $cs;
+$cs .= 'k';
+$cs =~ s/\$\\|\./x/g;
+my $path_state_save = '/tmp/' . $user . '.' . $FindBin::Script;
 my $statuses;
 my $high_water = 1;
 my %name_colors;
@@ -70,10 +80,42 @@ my $nt = Net::Twitter->new(
   traits => [qw(
     API::Lists
     API::REST
+    OAuth
   )],
-  username => $user,
-  password => $pass,
+  consumer_key => $consumer_key,
+  consumer_secret => $cs,
 );
+
+my $twitter_state;
+eval {
+  $twitter_state = retrieve $path_state_save;
+};
+
+# check for successful state retrieval, rebuild if needed
+
+if (!$twitter_state || $@) {
+  my $auth_url = $nt->get_authorization_url;
+  print "you may need to authorize $FindBin::Script at " . $auth_url->as_string . "\n";
+  print "enter pin: ";
+  chomp(my $pin = <STDIN>);
+  unless ($pin) {
+    die "bad pin";
+  }
+
+  ($twitter_state->{access_token}, $twitter_state->{access_token_secret}) = $nt->request_access_token(
+    verifier => $pin,
+  );
+  if ($twitter_state && $twitter_state->{access_token} && $twitter_state->{access_token_secret}) {
+    store $twitter_state, $path_state_save;
+  }
+}
+
+# authorize
+
+unless ($nt->authorized) {
+  $nt->access_token($twitter_state->{access_token});
+  $nt->access_token_secret($twitter_state->{access_token_secret});
+}
 
 # for list mode, get the list id and verify the list actually exists
 
@@ -152,11 +194,14 @@ while ( 1 ) {
         count => 20,
       });
     };
-    unless ($@) {
+    if ($@) {
+      warn $@;
+    }
+    else {
       $result = 'success';
     }
     if ($args{debug}) {
-      print " $result \n";
+      print " $result $@\n";
     }
   }
   print_statuses($statuses);
@@ -165,7 +210,7 @@ while ( 1 ) {
   # otherwise, exit the loop
 
   if ($args{follow}) {
-    unless ($args{follow} >= 1) { $args{follow} = 1; }
+    unless ($args{follow} >= .5) { $args{follow} = .5; }
     sleep $args{follow} * 60;
   }
   else {
