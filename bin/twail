@@ -9,21 +9,22 @@ usage:
   $0 [--user u] [--color] [--debug] [--follow m] [--list l] [--timestamp] [--help]
 
 where:
-  --user      : is the Twitter user name
-  --color     : ANSI color output
-  --debug     : print some debugging output
-  --follow    : refresh every m minutes, printing new tweets ala tail -f
+  --user      : user name for logging into the API
+  --color     : enable ANSI color output
+  --debug     : enable printing some debugging output
+  --follow    : poll API every m minutes, printing new tweets ala "tail -f"
   --list      : print statuses from a list you own
-  --timestamp : print timestamp every update
+  --timestamp : print a timestamp upon every update
 
 examples:
-  $0 --user scobleizer --follow 1 
-  $0 -u questzero -f .5 -c -l toptwenty 
+  $0 --user scobleizer --follow 1        # long arg format
+  $0 -u questzero -f .5 -c -l toptwenty  # short arg format 
 USAGE
 
 use Data::Dumper;
 use Date::Parse;
 use Encode;
+use File::Spec;
 use FindBin;
 use Getopt::Long;
 use Net::Twitter;
@@ -63,8 +64,9 @@ my $cs = ''
 ;
 $cs = 'J' . $cs;
 $cs .= 'k';
+my $path_tmpdir = File::Spec->tmpdir;
 $cs =~ s/\$\\|\./x/g;
-my $path_state_save = '/tmp/' . $user . '.' . $FindBin::Script;
+my $path_state_save = "$path_tmpdir/" . $user . '.' . $FindBin::Script;
 my $statuses;
 my $high_water = 1;
 my %name_colors;
@@ -257,7 +259,7 @@ sub print_statuses {
       $name_print = $name_colors{$name_print} . $name_print . color('reset');
     }
     #my $screen_name = sprintf '%-14s', $name_print;
-    my $screen_name = ' ' x (14 - $length_screen_name) . $name_print;
+    my $screen_name = ' ' x (15 - $length_screen_name) . $name_print;
     print $screen_name;
     if ($args{color}) {
       print color('blue');
