@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+# purpose : snaps photos from /dev/video* devices does stuff with them 
+# TODO:
+# - send email via mpack
+# - filter which devices to snap
+
+my $usage = <<USAGE;
+
+usage:
+  $0 [--mailto some\@email.com
+USAGE
+
+use Data::Dumper;
+use Getopt::Long;
+use strict;
+use warnings;
+
+my $path_base_devices = '/dev/video';
+my @options = qw(
+  help
+  mailto=s
+);
+my %args;
+GetOptions(\%args, @options);
+if ($args{help}) {
+  print "$usage\n";
+  exit 2;
+}
+
+my @devices_vid = glob "$path_base_devices*";
+unless (scalar @devices_vid) { die "no video devices found at $path_base_devices!"; }
+foreach my $device (@devices_vid) {
+  my $syntax_snap = qq(streamer -f jpeg -c $device -o /dev/stdout | display &);
+  system $syntax_snap;
+}
