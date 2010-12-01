@@ -119,8 +119,6 @@ unless ($nt->authorized) {
   $nt->access_token($twitter_state->{access_token});
   $nt->access_token_secret($twitter_state->{access_token_secret});
 }
-my $rate_limit = $nt->rate_limit;
-my $rate_remaining = $nt->rate_remaining;
 
 # for list mode, get the list id and verify the list actually exists
 
@@ -161,6 +159,8 @@ if ($args{list}) {
 # the big twail loop (if in follow mode)
 
 while ( 1 ) {
+  my $rate_limit = $nt->rate_limit;
+  my $rate_remaining = $nt->rate_remaining;
 
   # list mode
 
@@ -168,7 +168,7 @@ while ( 1 ) {
     my $result = 'failure';
     if ($args{debug}) {
       my $timestamp = localtime();
-      print "$timestamp fetching list $user/$list_id ";
+      print "$timestamp $rate_remaining/$rate_limit list $user/$list_id ";
     }
     eval {
       $statuses = $nt->list_statuses({
