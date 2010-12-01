@@ -83,6 +83,7 @@ my $nt = Net::Twitter->new(
     API::Lists
     API::REST
     OAuth
+    RateLimit
   )],
   consumer_key => $consumer_key,
   consumer_secret => $cs,
@@ -118,6 +119,8 @@ unless ($nt->authorized) {
   $nt->access_token($twitter_state->{access_token});
   $nt->access_token_secret($twitter_state->{access_token_secret});
 }
+my $rate_limit = $nt->rate_limit;
+my $rate_remaining = $nt->rate_remaining;
 
 # for list mode, get the list id and verify the list actually exists
 
@@ -178,7 +181,7 @@ while ( 1 ) {
       $result = 'success';
     }
     if ($args{debug}) {
-      print " $result \n";
+      print "$result \n";
     }
   }
 
@@ -188,7 +191,7 @@ while ( 1 ) {
     my $result = 'failure';
     if ($args{debug}) {
       my $timestamp = localtime();
-      print "$timestamp fetching timeline > $high_water ";
+      print "$timestamp $rate_remaining/$rate_limit timeline > $high_water ";
     }
     eval {
       $statuses = $nt->friends_timeline({
@@ -203,7 +206,7 @@ while ( 1 ) {
       $result = 'success';
     }
     if ($args{debug}) {
-      print " $result $@\n";
+      print "$result $@\n";
     }
   }
   print_statuses($statuses);
@@ -212,7 +215,7 @@ while ( 1 ) {
   # otherwise, exit the loop
 
   if ($args{follow}) {
-    unless ($args{follow} >= .5) { $args{follow} = .5; }
+    unless ($args{follow} >= .2) { $args{follow} = .2; }
     sleep $args{follow} * 60;
   }
   else {
