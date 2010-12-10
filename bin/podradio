@@ -24,7 +24,7 @@ my @players = (
   #'mocp',
   #'mp3blaster',
 );
-my $tag = $ARGV[0] || 'podtech';
+my $tag = $ARGV[1] || 'podtech';
 my $url_get = $url_base . $tag;
 print "playing: $url_get\n";
 my $ua = LWP::UserAgent->new;
