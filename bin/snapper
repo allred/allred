@@ -31,5 +31,6 @@ my @devices_vid = glob "$path_base_devices*";
 unless (scalar @devices_vid) { die "no video devices found at $path_base_devices!"; }
 foreach my $device (@devices_vid) {
   my $syntax_snap = qq(streamer -f jpeg -c $device -o /dev/stdout | display &);
+  print "exec: $syntax_snap\n";
   system $syntax_snap;
 }
