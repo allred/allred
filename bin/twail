@@ -2,6 +2,7 @@
 # purpose : like the unix "tail" command for Twitter
 # TODO:
 # - allow following arbitrary and multiple lists
+# - change pipe char to exclamation when rate limit is low
 
 my $usage = <<USAGE;
 

@@ -1,31 +1,48 @@
 #!/usr/bin/perl
 # purpose : command line podcast player
 #           plays media files from a Google Reader public/shared feed
+# howto:
+# - create a label in Google Reader
+# - make the label public
+# - find your User ID in the resulting public URL
+# - associate podcast feeds with the aforementioned label
+# - pass the User ID and label to this script
 # requirements:
+# - should work on Linux
 # - see @players for list of compatible players, add your own to the list
 # TODO:
 # - pass FF user agent string to mplayer (and vlc?) to bypass filtering
-# - YAML output;
+# - YAML output instead of Dumper?
+
 my $usage = <<<USAGE;
-$0 [GoogleReaderPublicLabel]
+$0 --label GoogleReaderPublicLabel --user GoogleReaderUserId
 USAGE
 
 use Data::Dumper;
+use Getopt::Long;
 use LWP::UserAgent;
 use warnings;
 use strict;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Terse = 1;
 
-my $url_base = "http://www.google.com/reader/public/atom/user%2F12483683802801775802%2Flabel%2F";
 my @players = (
   'mplayer',
   'vlc -Idummy',
   #'mocp',
   #'mp3blaster',
 );
-my $tag = $ARGV[0] || 'podtech';
-my $url_get = $url_base . $tag;
+
+my %args;
+GetOptions(\%args, qw(
+  label=s
+  player=s
+  user=s
+));
+my $label = $args{label} || 'podtech';
+my $user = $args{user} || '12483683802801775802';
+
+my $url_get = "http://www.google.com/reader/public/atom/user%2F$user%2Flabel%2F$label";
 print "playing: $url_get\n";
 my $ua = LWP::UserAgent->new;
 
@@ -62,8 +79,11 @@ while ($html =~ m{
   my $syntax_player = qq($player_found $match);
   unless ($files_played{$file}) {
     print localtime() . ' : running ' . Dumper $syntax_player;
-    system $syntax_player;
+    my $rc_player = system $syntax_player;
     $files_played{$file}++;
+    if ($rc_player != 0) {
+      die "non-zero exit by player";
+    }
   }
 }
 
