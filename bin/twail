@@ -33,6 +33,7 @@ use Storable;
 use Term::ANSIColor;
 use strict;
 use warnings;
+$| = 1;
 
 # handle args
 
@@ -241,12 +242,16 @@ sub print_statuses {
     if ($args{color}) {
       print color 'blue';
     }
-    print ' ' x (80  - ($length_timestamp + 1)) . ' ' . $timestamp . "\n";
+    print "\n" . ' ' x (80  - ($length_timestamp + 1)) . ' ' . $timestamp;
     if ($args{color}) {
       print color 'reset';
     }
   }
-  for my $status ( reverse @$statuses ) {
+  my $index = 0;
+  foreach my $status ( reverse @$statuses ) {
+    if ($index != ($#$statuses + 1)) {
+      print "\n";
+    }
     $high_water = $status->{id};
     my $etime;
     eval { $etime = str2time $status->{created_at}; };
@@ -273,7 +278,6 @@ sub print_statuses {
       print color('reset');
     }
     print encode 'utf8',  $status->{text};
-    print "\n";
+    $index++;
   }
 }
-
