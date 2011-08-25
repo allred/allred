@@ -3,6 +3,8 @@
 # TODO:
 # - allow following arbitrary and multiple lists
 # - change pipe char to exclamation when rate limit is low
+# - fix yomi mode (deep recursion errors coming from module)
+no warnings 'recursion';
 
 my $usage = <<USAGE;
 
@@ -15,6 +17,7 @@ where:
   --debug     : enable printing some debugging output
   --follow    : poll API every m minutes, printing new tweets ala "tail -f"
   --list      : print statuses from a list you own
+  --mode      : misc output modes [yomi]
   --timestamp : print a timestamp upon every update
 
 examples:
@@ -28,6 +31,7 @@ use Encode;
 use File::Spec;
 use FindBin;
 use Getopt::Long;
+use Lingua::JA::Yomi;
 use Net::Twitter;
 use Storable;
 use Term::ANSIColor;
@@ -43,6 +47,7 @@ my @options = qw(
   follow=s
   help
   list=s
+  mode=s
   user=s
 );
 my %args;
@@ -120,6 +125,14 @@ if (!$twitter_state || $@) {
 unless ($nt->authorized) {
   $nt->access_token($twitter_state->{access_token});
   $nt->access_token_secret($twitter_state->{access_token_secret});
+}
+
+# yomi mode (transcribe to katakana)
+
+my $yomi;
+if ($args{mode} && $args{mode} eq 'yomi') {
+  $yomi = Lingua::JA::Yomi->new;
+  #$yomi->debug(1);
 }
 
 # for list mode, get the list id and verify the list actually exists
@@ -277,7 +290,14 @@ sub print_statuses {
     if ($args{color}) {
       print color('reset');
     }
-    print encode 'utf8',  $status->{text};
+    my $status_out = $status->{text};
+    if ($args{mode} && $args{mode} eq 'yomi') {
+      eval {
+        my $status_utf8 = encode 'utf8', $status->{text};
+        $status_out = $yomi->convert($status_utf8) . ' (' . $status->{text} . ')';
+      };
+    }
+    print encode 'utf8',  $status_out;
     $index++;
   }
 }
