@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+# purpose : find and shorten long filenames
+# TODO:
+# - scan and report max filename length or histogram of lengths
+# - apply various shortening techniques, ie remove whitespace
+# - test for collisions before rename
+use Cwd;
+use Data::Dumper;
+use File::Find;
+use Getopt::Long;
+use strict;
+use warnings;
+
+my $usage = <<USAGE;
+  $0 [--report] [--help]
+USAGE
+
+my @options = qw(
+  help
+  report
+);
+my %args;
+GetOptions(\%args, @options);
+if ($args{help}) {
+  print "$usage\n";
+  exit 2;
+}
+
+my $sub_wanted = \&report;
+
+find($sub_wanted, getcwd);
+
+sub report {
+  my $name_file = $_;
+  my $length_filename = length $name_file;
+  print "$length_filename $File::Find::name\n";
+}
+
