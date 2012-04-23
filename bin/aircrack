@@ -1,0 +1,11 @@
+#!/usr/bin/ruby -w
+$:.unshift File.join(File.dirname(__FILE__), '.')
+require 'airutils'
+
+if (ARGV[0]) then
+	essid = ARGV[0]
+	bssid, channel = AirUtils.parse_scan(essid)
+	syntax_aircrack = "aircrack-ng -s -z -b %s \"%s\"*.ivs" % [bssid, essid]
+	puts syntax_aircrack
+	system(syntax_aircrack)
+end

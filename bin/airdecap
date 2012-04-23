@@ -1,0 +1,42 @@
+#!/usr/bin/ruby -w
+# purpose : glob the decrypted pcaps and xtract files
+# TODO:
+# - write another script to xtract
+#syntax = tcpxtract -o ~/tmp/txpxtract -f "/home/mallred/aircrack/L&M-01.cap"
+
+$:.unshift File.join(File.dirname(__FILE__), '.')
+require 'airutils'
+require 'pp'
+require 'yaml'
+
+usage = <<usage
+usage:
+  #{$0}
+usage
+
+path_aircracks = '/home/mallred/aircrack'
+path_keys = '/home/mallred/s/aircracks.yml'
+keys = YAML::load_file(path_keys)
+if (!keys)
+  pp "key file not found!"
+  exit 1
+end
+
+# iterate through cap files, decrypt and delete on success
+
+Dir.glob("#{path_aircracks}/*[0-9].cap").each { |f|
+  f =~ /.*\/(.*)\-\d+\.cap/
+  if (key = (keys[$1] && keys[$1]['key']))
+
+    # decrypt
+
+    rc_decap = system(%q!airdecap-ng -w "%s" "%s"! % [key, f])
+    pp [rc_decap, f, key]
+
+    # remove crypt file upon success
+
+    if (rc_decap)
+      system(%q!rm -fv "%s"! % [f])
+    end
+  end
+}

