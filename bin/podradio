@@ -14,7 +14,7 @@
 # - pass FF user agent string to mplayer (and vlc?) to bypass filtering
 # - YAML output instead of Dumper?
 
-my $usage = <<<USAGE;
+my $usage = <<"USAGE";
 $0 --label GoogleReaderPublicLabel --user GoogleReaderUserId
 USAGE
 
