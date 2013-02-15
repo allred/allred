@@ -27,7 +27,7 @@ $Data::Dumper::Indent = 1;
 $Data::Dumper::Terse = 1;
 
 my @players = (
-  'mplayer',
+  'mplayer -audiofile-cache 60000',
   'vlc -Idummy',
   #'mocp',
   #'mp3blaster',
