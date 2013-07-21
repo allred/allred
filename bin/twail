@@ -4,7 +4,6 @@
 # - allow following arbitrary and multiple lists
 # - change pipe char to exclamation when rate limit is low
 # - fix yomi mode (deep recursion errors coming from module)
-no warnings 'recursion';
 
 my $usage = <<USAGE;
 
@@ -31,8 +30,7 @@ use Encode;
 use File::Spec;
 use FindBin;
 use Getopt::Long;
-use Lingua::JA::Yomi;
-use Net::Twitter;
+use Net::Twitter::Lite::WithAPIv1_1;
 use Storable;
 use Term::ANSIColor;
 use strict;
@@ -85,13 +83,7 @@ my @colors_foreground_screen_names = qw(
   yellow
 );
 
-my $nt = Net::Twitter->new(
-  traits => [qw(
-    API::Lists
-    API::REST
-    OAuth
-    RateLimit
-  )],
+my $nt = Net::Twitter::Lite::WithAPIv1_1->new(
   consumer_key => $consumer_key,
   consumer_secret => $cs,
 );
@@ -131,7 +123,7 @@ unless ($nt->authorized) {
 
 my $yomi;
 if ($args{mode} && $args{mode} eq 'yomi') {
-  $yomi = Lingua::JA::Yomi->new;
+  #$yomi = Lingua::JA::Yomi->new;
   #$yomi->debug(1);
 }
 
@@ -147,7 +139,7 @@ if ($args{list}) {
     print "$timestamp fetching lists for user $user ";
   }
   eval {
-    $list_data = $nt->get_lists($user);
+    $list_data = $nt->get_lists;
   };
   if ($@) {
     $result = 'failure';
@@ -157,7 +149,8 @@ if ($args{list}) {
     print " $result\n";
   }
   if ($list_data) {
-    foreach my $list (@{$list_data->{lists}}) {
+    #foreach my $list (@{$list_data->{lists}}) {
+    foreach my $list (@$list_data) {
       push @lists_found, $list->{name};
       if ($args{list} eq $list->{name}) {
         $list_id = $list->{id};
@@ -174,8 +167,8 @@ if ($args{list}) {
 # the big twail loop (if in follow mode)
 
 while ( 1 ) {
-  my $rate_limit = $nt->rate_limit;
-  my $rate_remaining = $nt->rate_remaining;
+  #my $rate_limit = $nt->rate_limit_status;
+  #my $rate_remaining = $nt->rate_remaining;
 
   # list mode
 
@@ -183,7 +176,7 @@ while ( 1 ) {
     my $result = 'failure';
     if ($args{debug}) {
       my $timestamp = localtime();
-      print "$timestamp $rate_remaining/$rate_limit list $user/$list_id ";
+      #print "$timestamp $rate_remaining/$rate_limit list $user/$list_id ";
     }
     eval {
       $statuses = $nt->list_statuses({
@@ -206,10 +199,11 @@ while ( 1 ) {
     my $result = 'failure';
     if ($args{debug}) {
       my $timestamp = localtime();
-      print "$timestamp $rate_remaining/$rate_limit timeline > $high_water ";
+      #print "$timestamp $rate_remaining/$rate_limit timeline > $high_water ";
+      print "$timestamp timeline > $high_water ";
     }
     eval {
-      $statuses = $nt->friends_timeline({
+      $statuses = $nt->home_timeline({
         since_id => $high_water,
         count => 20,
       });
