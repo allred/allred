@@ -167,16 +167,20 @@ if ($args{list}) {
 # the big twail loop (if in follow mode)
 
 while ( 1 ) {
-  #my $rate_limit = $nt->rate_limit_status;
-  #my $rate_remaining = $nt->rate_remaining;
+  my $rate_limit_status = $nt->rate_limit_status;
+  my $rate_limit = 0;
+  my $rate_remaining = 0;
 
   # list mode
 
   if ($args{list}) {
     my $result = 'failure';
+    my $rate_lists_statuses = $rate_limit_status->{resources}->{lists}->{'/lists/statuses'};
+    $rate_remaining = $rate_lists_statuses->{remaining};
+    $rate_limit = $rate_lists_statuses->{limit};
     if ($args{debug}) {
       my $timestamp = localtime();
-      #print "$timestamp $rate_remaining/$rate_limit list $user/$list_id ";
+      print "\n$timestamp $rate_remaining/$rate_limit list $user/$list_id hw:$high_water ";
     }
     eval {
       $statuses = $nt->list_statuses({
