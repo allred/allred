@@ -203,8 +203,10 @@ while ( 1 ) {
     my $result = 'failure';
     if ($args{debug}) {
       my $timestamp = localtime();
-      #print "$timestamp $rate_remaining/$rate_limit timeline > $high_water ";
-      print "$timestamp timeline > $high_water ";
+      my $rate_limit_home_timeline = $rate_limit_status->{resources}->{statuses}->{'/statuses/home_timeline'};
+      $rate_remaining = $rate_limit_home_timeline->{remaining};
+      $rate_limit = $rate_limit_home_timeline->{limit};
+      print "$timestamp $rate_remaining/$rate_limit timeline > $high_water ";
     }
     eval {
       $statuses = $nt->home_timeline({
