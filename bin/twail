@@ -86,6 +86,7 @@ my @colors_foreground_screen_names = qw(
 my $nt = Net::Twitter::Lite::WithAPIv1_1->new(
   consumer_key => $consumer_key,
   consumer_secret => $cs,
+  ssl => 1,
 );
 
 my $twitter_state;
