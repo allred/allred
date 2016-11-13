@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+# streamer -f jpeg -o ?
+# cheese ?
+# pipe streamer to display
+# check snapper in old allred git repo
+# streamer -f jpeg -c $device -o /dev/stdout
+random_filename_component = rand(3)
+tmpfile = '/var/tmp/snapshot.jpg'
+dir_outfiles = "#{ENV['HOME']}/Downloads/snaps"
+Dir.mkdir dir_outfiles unless Dir.exists? dir_outfiles
+Dir.chdir dir_outfiles
+outfile = "#{dir_outfiles}/snapshot#{random_filename_component}.jpg"
+# TODO:
+# * reduce border padding in pdf
+# use imagemagick identify to find the height width of an image
+# 1680x1050
+# see if we can brighten up textcolor with a hex format or something
+# geometry max is: 789 x 1050 why? research these fucking numbers
+# htmldoc
+# * sometimes this command splits the output into two pages
+# ** then the convert fails
+# ** maybe --fontsize will remedy this
+# * maybe --size will help
+# * maybe encapsulating text in <pre> would work, no color
+# * color can be html color or rgb hex #RRGGBB
+# * https://www.msweet.org/documentation/project1/HTMLDOC.html#8_6
+# imagesnap
+# * -w doesn't really affect the image in low light
+textcolor = ['white', 'red', '#c0c0ff', '#c0ffc0', '#ffc0ff'].sample
+textfont = 'Monospace'
+cmd = <<-eoc
+  fswebcam -r 640x480 --jpeg 100 --no-banner -F 2 -D 5 -S 13 /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1600x900!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
+eoc
+  #streamer -w 1 -s 640x480 -f jpeg -c /dev/video0 -o /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=80x50 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1600x900!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
+  # below needs bigger images from streamer for xscreensaver-getimage-file
+  # try 640x480
+  #streamer -s 640x480 -f jpeg -c /dev/video0 -o /dev/stdout | jp2a - --size=80x48 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 12.2 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont monospace --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1600x900!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
+  #imagesnap -w 1 - | tee snap_cam.jpg | jp2a - --size=80x48 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 12.2 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont monospace --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1680x1050!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
+  #imagesnap -w 1 - | tee snap_cam.jpg | jp2a - --size=80x48 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf --fontsize 10.3 --textcolor "#{textcolor}" --textfont monospace --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1680x1050!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
+  # below works, low res and slightly shifted right
+  #imagesnap - | jp2a - --size=80x48 --background=dark --fill --color --html-raw | htmldoc -f snap.pdf --textcolor green --textfont monospace --webpage --bodycolor black --color --textcolor white - && convert ./snap.pdf -quality 100 -resize "1680x1050!" #{tmpfile} && cp -v #{tmpfile} #{outfile}
+  # the below works, but wide and small
+  #imagesnap - | jp2a - --size=160x48 --background=dark --fill --color --html-raw | htmldoc -f snap.pdf --fontsize 3.0 --textfont monospace --webpage --bodycolor black --color --textcolor white - && convert ./snap.pdf -quality 100 -resize "1680x1050!" #{tmpfile} && cp -v #{tmpfile} #{outfile}
+  #imagesnap -w 2 - | jp2a - --size=80x24 --background=dark --fill --color --html-raw | htmldoc -f snap.pdf --webpage --bodycolor black --color --textcolor white - && convert ./snap.pdf -geometry 788x1050 #{tmpfile} && cp -v #{tmpfile} #{outfile}
+  #rm -v /Users/mikeallred/Downloads/snaps/*; imagesnap - | jp2a - --size=320x44 --background=dark --fill --color --html-raw | htmldoc -f snap.pdf --webpage --bodycolor black --color --textcolor gray - && convert ./snap.pdf -geometry 1680x1050 #{tmpfile} && cp -v #{tmpfile} #{outfile}
+
+# check if screensaver is running, otherwise do nothing
+#`pgrep ScreenSaverEngine`
+#if true || $? == 0 
+output_xc = `xscreensaver-command -time`
+if  output_xc =~ /locked|\sblanked/
+  puts "-=[#{Time.now}]=-"
+  puts cmd
+  system cmd
+else
+  puts [output: output_xc]
+end
