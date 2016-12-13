@@ -1,20 +1,14 @@
-#!/usr/bin/perl
+#!/usr/bin/env ruby
 # purpose : snaps photos from /dev/video* devices and converts to ASCII
-# TODO:
-# - pipe vs. temp file
-use Data::Dumper;
-use File::Temp;
-use strict;
-use warnings;
 
-my $path_base_devices = '/dev/video';
-my $path_outfile = '/tmp/asciisnap.jpeg';
+cmd_info = <<-eoc
+  v4l2-ctl --all
+eoc
 
-chomp(my @devices_vid = `ls $path_base_devices*`);
-unless (scalar @devices_vid) { die "no video devices found!"; }
-foreach my $device (@devices_vid) {
-  my $syntax_streamer = qq(streamer -f jpeg -c $device -o $path_outfile);
-  system $syntax_streamer;
-  my $syntax_jp2a = qq(jp2a --color --fill --invert --verbose $path_outfile);
-  system $syntax_jp2a;
-}
+`#{cmd_info}`.chomp =~ /Width\/Height\s+:\s+(\d+\/\d+)/
+width_height = $1.gsub!('/', 'x')
+
+cmd_snap = <<-eoc
+  fswebcam -q -r #{width_height} --jpeg 100 --no-banner /dev/stdout | jp2a - -f --background=dark --colors
+eoc
+system cmd_snap
