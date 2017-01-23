@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+$: << File.join(File.dirname(__FILE__), '..', 'lib')
+require 'allred'
+
+url_joker = "https://svc.joker.com/nic/update?username=#{ENV['USERNAME_JOKER_DYN']}&password=#{ENV['PASS_JOKER_DYN']}&hostname=#{ENV['HOSTNAME_JOKER_DYN']}"
+output = open(url_joker).read
+puts output

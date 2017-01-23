@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+# purpose: WIP, update route53 as dynamic dns
+$: << File.join(File.dirname(__FILE__), '..', 'lib')
+require 'allred/aws'
+require 'ipaddress'
+require 'open-uri'
+
+route53 = Allred::Aaws.new.route53
+
+my_ip = open('http://whatismyip.akamai.com').read
+unless IPAddress.valid? my_ip
+  abort "invalid IP address"
+end
+puts route53.operation_names
