@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+# purpose: use SoftFM to play radio
+# need libasound2-dev
+# aplay -L to get alsa devices
+
+#freq = '104.3M'
+#freq = '476.7875M'
+freq = ARGV[0] || '93.9M'
+cmd = <<-eoc
+  #{ENV['HOME']}/gits/SoftFM/build/softfm -f #{freq} -Phw:CARD=PCH,DEV=0
+eoc
+system cmd
+
