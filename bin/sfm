@@ -6,8 +6,17 @@
 #freq = '104.3M'
 #freq = '476.7875M'
 freq = ARGV[0] || '93.9M'
-cmd = <<-eoc
+
+cmd1 = <<-eoc
+  #{ENV['HOME']}/gits/SoftFM/build/softfm -f #{freq}
+eoc
+
+cmd2 = <<-eoc
   #{ENV['HOME']}/gits/SoftFM/build/softfm -f #{freq} -Phw:CARD=PCH,DEV=0
 eoc
-system cmd
+
+system cmd1
+unless $?.success?
+  system cmd2
+end
 

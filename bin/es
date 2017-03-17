@@ -6,6 +6,8 @@ def speak(phrase)
   case `hostname`.chomp
     when "orcus"
       @device = "plughw:CARD=PCH,DEV=0"
+    when "rp2-piloto-1"
+      @device = "plughw:CARD=ALSA,DEV=1"
     else
   end
 
