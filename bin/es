@@ -15,7 +15,10 @@ def speak(phrase)
 
   file_tmp = Tempfile.new(['es', '.wav'])
   cmd = <<-eoc
-    pico2wave --wave #{file_tmp.path} "#{phrase}" && aplay -D #{@device} #{file_tmp.path}
+    export AUDIODEV="#{@device}"
+    pico2wave --wave #{file_tmp.path} "#{phrase}" && play #{file_tmp.path} \
+      gain -n\
+      speed .8
   eoc
   puts cmd
   system cmd
