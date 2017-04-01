@@ -12,7 +12,7 @@ def speak(phrase)
   end
 
   cmd = <<-eoc
-    espeak "#{phrase}" -v en-us --stdout | aplay -D #{@device}
+    espeak "#{phrase}" -v en-us --stdout | play -D #{@device}
   eoc
 
   file_tmp = Tempfile.new(['es', '.wav'])
