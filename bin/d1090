@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+# purpose: run dump1090 interactive to see output from fr24 instance
+
+port_manage = 8754
+port_input_raw = 30001
+port_output_raw = 30002
+port_output_basestation = 30003
+port_input_beast = 30004
+port_output_beast = 30005
+path_dump1090 = "#{ENV['HOME']}/gits/dump1090/dump1090"
+path_dump1090 = "/usr/lib/fr24/dump1090"
+port_listen = port_output_raw
+file_input = '/home/pi/gits/dump1090/testfiles/modes1.bin'
+file_input = '-'
+
+# sleep 1 sec to allow dump1090 to start listening
+
+cmd = <<-eoc
+  sleep 1 && nc localhost #{port_output_raw} | nc localhost #{port_input_raw} &
+  #{path_dump1090} --interactive --net-only --net-ro-port 40002 --net-sbs-port 40003
+eoc
+puts cmd
+system cmd
