@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# http://www.sigidwiki.com/wiki/POCSAG
+# https://www.raspberrypi.org/forums/viewtopic.php?t=45142
+
+cmd = <<-eoc
+  rtl_fm -o 4 -A lut -s 22050 -f 35.2M - | multimon-ng -t raw -a POCSAG512 -a POCSAG1200 -a POCSAG2400 -f alpha - 
+eoc
+  #rtl_fm -o 4 -A lut -s 22050 -f 153.350M - | multimon-ng -t raw -a POCSAG512 -a POCSAG1200 -a POCSAG2400 -f alpha /dev/stdin
+puts cmd
+system cmd
