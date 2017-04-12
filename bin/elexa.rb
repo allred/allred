@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# purpose: generate and speak alexa commands
+# purpose: webserver front end to generate and speak alexa commands
 # aplay -L to get audio device
 require 'sinatra'
 
