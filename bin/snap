@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# purpose: take a snapshot from laptop camera when screensaver is activated
 # streamer -f jpeg -o ?
 # cheese ?
 # pipe streamer to display
@@ -28,12 +29,13 @@ outfile = "#{dir_outfiles}/snapshot#{random_filename_component}.jpg"
 # * -w doesn't really affect the image in low light
 textcolor = ['#c0c0c0', '#00ff00', 'red', '#c0c0ff', '#c0ffc0', '#ffc0ff'].sample
 textfont = 'Monospace'
+# this was for draak
 cmd = <<-eoc
   fswebcam -r 640x480 --jpeg 100 --no-banner -F 2 -D 5 -S 13 /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1600x900!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
 eoc
 if `hostname`.chomp == 'orcus'
   cmd = <<-eoc
-    fswebcam -r 1280x720 --jpeg 100 --no-banner -F 2 -D 5 -S 13 /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "3200x1800!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
+    fswebcam -r 1280x720 --jpeg 100 --no-banner -F 2 -D 5 -S 13 /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "3200x1800!" -quality 1 #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
   eoc
 end
   #streamer -w 1 -s 640x480 -f jpeg -c /dev/video0 -o /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=80x50 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1600x900!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
