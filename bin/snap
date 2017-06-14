@@ -33,9 +33,15 @@ textfont = 'Monospace'
 cmd = <<-eoc
   fswebcam -r 640x480 --jpeg 100 --no-banner -F 2 -D 5 -S 13 /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1600x900!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
 eoc
-if `hostname`.chomp == 'orcus'
+if `hostname -s`.chomp == 'orcus'
   cmd = <<-eoc
     fswebcam -r 1280x720 --jpeg 100 --no-banner -F 2 -D 5 -S 13 /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "3200x1800!" -quality 1 #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
+  eoc
+end
+if `hostname -s`.chomp == 'wyvern'
+  # brew install ghostscript
+  cmd = <<-eoc
+    imagesnap -w 1 - | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize '2560x1600!' -quality 1 #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
   eoc
 end
   #streamer -w 1 -s 640x480 -f jpeg -c /dev/video0 -o /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=80x50 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1600x900!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
@@ -52,13 +58,28 @@ end
   #rm -v /Users/mikeallred/Downloads/snaps/*; imagesnap - | jp2a - --size=320x44 --background=dark --fill --color --html-raw | htmldoc -f snap.pdf --webpage --bodycolor black --color --textcolor gray - && convert ./snap.pdf -geometry 1680x1050 #{tmpfile} && cp -v #{tmpfile} #{outfile}
 
 # check if screensaver is running, otherwise do nothing
-#`pgrep ScreenSaverEngine`
-#if true || $? == 0 
-output_xc = `xscreensaver-command -time`
-if  output_xc =~ /locked|\sblanked/
+
+def runcmd(cmd)
   puts "-=[#{Time.now}]=-"
   puts cmd
   system cmd
-else
-  puts [output: output_xc]
+end
+
+case `uname`.chomp
+  when "Linux"
+    output_xc = `xscreensaver-command -time`
+    if  output_xc =~ /locked|\sblanked/
+      runcmd(cmd)
+    else
+      puts [output: output_xc]
+    end
+  when "Darwin"
+   `pgrep ScreenSaverEngine`
+    if $? == 0 
+      runcmd(cmd)
+    else
+      puts "ScreenSaverEngine not running"
+    end
+  else
+    puts "unknown OS"
 end
