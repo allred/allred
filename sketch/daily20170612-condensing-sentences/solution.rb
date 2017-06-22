@@ -3,20 +3,36 @@
 # https://stackoverflow.com/questions/2070574/is-there-a-reason-that-we-cannot-iterate-on-reverse-range-in-ruby
 
 class Solution
+  def truncate(s1, s2)
+    return s1 + s2
+  end
+
   def condense(s)
     sentence_condensed = ''
     words = s.split(/\s+/)
     words.each_with_index do |w, i|
-      unless words[i+1]
-        sentence_condensed += w
-      end
       word1 = w.split('')
+      if words[i+1]
+        word2 = words[i+1].split('')
+      else
+        sentence_condensed += w
+        next
+      end
+      #puts words[i+1].split('')
+      iterator_word2 = 0
       (0..word1.length).reverse_each do |i1|
-        # need to iterate from the end of word 1
-        # and increase the length to find longest match
-        puts i1
-        chunk1 = word1[i1..word1.length-1].join('')
-        puts [d: chunk1]
+        # can't continue if strings are non-equal in length
+        # also if, yeah.. that
+        next if i1 - 1 < 0
+        chunk1 = word1[(i1-1)..word1.length-1].join('')
+        chunk2 = word2[0 .. iterator_word2].join('')
+        next if chunk1.length != chunk2.length
+        puts [c1: chunk1, c2: chunk2, i1: i1]
+        if chunk1 == chunk2
+          truncated_word = truncate(chunk1, chunk2)
+          puts [MATCH: [chunk1, chunk2]]
+        end
+        iterator_word2 += 1
       end
     end
     return sentence_condensed
