@@ -3,39 +3,46 @@
 # https://stackoverflow.com/questions/2070574/is-there-a-reason-that-we-cannot-iterate-on-reverse-range-in-ruby
 
 class Solution
-  def truncate(s1, s2)
-    return s1 + s2
+  def truncate(w1, w2, overlap)
+    w2.gsub!(/^#{overlap}/, '')
+    return w1 + w2 
   end
 
   def condense(s)
-    sentence_condensed = ''
+    sentence_condensed = [] 
     words = s.split(/\s+/)
     words.each_with_index do |w, i|
+      overlap = '' 
       word1 = w.split('')
       if words[i+1]
         word2 = words[i+1].split('')
       else
-        sentence_condensed += w
+        sentence_condensed.push(w)
         next
       end
-      #puts words[i+1].split('')
       iterator_word2 = 0
       (0..word1.length).reverse_each do |i1|
         # can't continue if strings are non-equal in length
-        # also if, yeah.. that
         next if i1 - 1 < 0
         chunk1 = word1[(i1-1)..word1.length-1].join('')
         chunk2 = word2[0 .. iterator_word2].join('')
         next if chunk1.length != chunk2.length
         puts [c1: chunk1, c2: chunk2, i1: i1]
         if chunk1 == chunk2
-          truncated_word = truncate(chunk1, chunk2)
-          puts [MATCH: [chunk1, chunk2]]
+          overlap = chunk1
         end
         iterator_word2 += 1
       end
+      if overlap.length > 0 
+        truncated_word = truncate(word1.join(''), word2.join(''), overlap)
+        puts [MATCH: [word1.join(''), word2.join(''), truncated_word]]
+        words.delete_at(i+1)
+        words.insert(i+1, truncated_word)
+      else
+        sentence_condensed.push(w)
+      end
     end
-    return sentence_condensed
+    return sentence_condensed.join(' ')
   end
 end
 
