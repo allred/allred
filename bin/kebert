@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+require 'rest-client'
+
+url_base = 'jservice.io/api/random'
+response = JSON.pretty_generate(JSON.parse(RestClient.get(url_base)))
+qa = response
+puts qa
