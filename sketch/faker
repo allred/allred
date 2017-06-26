@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+require 'faker'
+require 'mojinizer'
+
+puts name = Faker::Name.name
+puts name.katakana
+puts Faker::Internet.email

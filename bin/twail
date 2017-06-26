@@ -21,7 +21,7 @@ where:
 
 examples:
   $0 --user scobleizer --follow 1        # long arg format
-  $0 -u questzero -f .5 -c -l toptwenty  # short arg format 
+  $0 -u mikeallred -f .5 -c -l twail     # short arg format
 USAGE
 
 use Data::Dumper;

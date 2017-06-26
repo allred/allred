@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+require 'json'
 require 'rest-client'
 
 url_base = 'jservice.io/api/random'
