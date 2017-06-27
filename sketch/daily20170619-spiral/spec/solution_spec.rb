@@ -15,6 +15,8 @@ class SolutionTest < Minitest::Test
     }
   end
   def test_solution
-    assert_equal 1, 1 
+    @tests.keys.each do |k|
+      assert_equal @tests[k], @solution.spiral(k) 
+    end
   end
 end
