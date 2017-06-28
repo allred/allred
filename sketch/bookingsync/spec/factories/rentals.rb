@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :rental do
-    name "MyString"
+    name Faker::GameOfThrones.city
     daily_rate 1
   end
 end
