@@ -29,6 +29,10 @@ class BookingsController < ApplicationController
 
   def booking_params
     params.permit(:start_at, :end_at, :client_email, :price)
+    if params[:end_at] && params[:start_at]
+      params[:price] = @rental.daily_rate * (params[:end_at].to_datetime - params[:start_at].to_datetime).to_i
+    end
+    #byebug
   end
 
   def set_rental
