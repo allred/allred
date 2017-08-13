@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 # purpose: take a snapshot from laptop camera when screensaver is activated
+# TODO:
+# use chrome headless to take a screenshot of the jp2a output
 # streamer -f jpeg -o ?
 # cheese ?
 # pipe streamer to display
