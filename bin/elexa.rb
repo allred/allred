@@ -8,6 +8,7 @@ configure do
   @@wake_word = 'alexa'
   @@wake_word = 'ahlexah.'
   @@device_audio = "plughw:CARD=PCH,DEV=0"
+  set :bind, '0.0.0.0'
 end
 
 def espeak(phrase)
