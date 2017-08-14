@@ -9,6 +9,3 @@ text = '''3
 '''
 sys.stdin = io.StringIO(text)
 print(input().strip())
-print(input().strip())
-print(input().strip())
-

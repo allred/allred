@@ -15,6 +15,11 @@ def fizzbuzz():
 def palindrome(s):
   arr = list(s) 
   is_palindrome = True
+
+  if arr[0:(int(len(arr)/2)) != arr[(int(len(arr[::-1])/2)):len(arr)-1]:
+      is_palindrome = False
+  return is_palindrome
+
   for idx, val in enumerate(arr):
     if arr[idx] != arr[(len(arr) - 1) - idx]:
       is_palindrome = False 
