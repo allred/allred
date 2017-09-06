@@ -14,5 +14,13 @@ t = int(input().strip())
 for a0 in range(t):
     n,k = input().strip().split(' ')
     n,k = [int(n),int(k)]
-    for x in itertools.product(range(1,n), range(2, 3)):
-        print(x)
+    print(k-1 if ((k-1) | k) <= n else k-2)
+    '''
+    vals = []
+    for x in range(1, n):
+        for y in range(x + 1, n + 1):
+            result = x&y
+            if result < k:
+                vals.append(result)
+    print(max(vals))
+    '''
