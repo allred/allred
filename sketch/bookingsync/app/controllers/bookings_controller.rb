@@ -16,6 +16,7 @@ class BookingsController < ApplicationController
   end
 
   def update
+    #byebug
     @booking.update(booking_params)
     head :no_content
   end
