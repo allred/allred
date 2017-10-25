@@ -1,1 +1,5 @@
 pidji/node_modules
+.byebug_history
+*.swp
+__pycache__
+grubscraper/screenshots/*
