@@ -12,6 +12,7 @@ function processData(input) {
       words[char + c2] = 1
     })
   })
+  console.log(words)
   console.log(Object.keys(words).length)
 }
 
