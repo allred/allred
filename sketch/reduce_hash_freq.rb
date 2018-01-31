@@ -9,7 +9,7 @@ names = [
   "bobsdiner",
 ]
 
-out = names.reduce(Hash.new(0)) {|hash, word| hash[word] += 1; hash}
+out = names.reduce(Hash.new(0)) {|memo, word| memo[word] += 1; memo}
 puts o: out
 
 =begin
