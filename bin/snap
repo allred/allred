@@ -43,9 +43,10 @@ end
 if `hostname -s`.chomp == 'wyvern'
   # brew install ghostscript
   cmd = <<-eoc
-    imagesnap -w 1 - | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize '2560x1600!' -quality 1 #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
+    ~/Downloads/ImageSnap-v0.2.5/imagesnap -w 1 - | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize '2560x1600!' -quality 1 #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
   eoc
 end
+    #imagesnap -w 1 - | tee /tmp/snap.jpg | jp2a - --size=110x69 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize '2560x1600!' -quality 1 #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
   #streamer -w 1 -s 640x480 -f jpeg -c /dev/video0 -o /dev/stdout | tee /tmp/snap.jpg | jp2a - --size=80x50 --background=dark --fill --color --html-raw | tee snap.html | htmldoc -f snap.pdf -v --fontsize 9 --textcolor "#{textcolor}" --left 0 --right 0 --bottom 0 --top 0 --textfont #{textfont} --webpage --bodycolor black --color - && convert ./snap.pdf -resize "1600x900!" #{tmpfile} && cp -v #{tmpfile} #{outfile} && identify #{outfile}
   # below needs bigger images from streamer for xscreensaver-getimage-file
   # try 640x480
