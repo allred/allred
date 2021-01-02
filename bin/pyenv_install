@@ -1,0 +1,4 @@
+#!/bin/bash
+CFLAGS="-I$(brew --prefix openssl)/include"
+LDFLAGS="-I$(brew --prefix openssl)/lib"
+pyenv install $*
