@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import json
 import requests
 from datetime import datetime
 
@@ -12,5 +13,11 @@ if __name__ == '__main__':
     datetime_simco = datetime_now.strftime('%Y-%m-%dT%H:%M:%S.000')
     uri_ticker = f'{uri_ticker_base}{datetime_simco}Z/'
     r = requests.get(uri_ticker)
-    print(r.content.decode("utf-8"))
-    #print(r.json())
+    #print(r.content.decode("utf-8"))
+    dict_ticker = r.json()
+    dict_out = {
+        "datetime_simco": datetime_simco,
+        "ticker": dict_ticker,
+        "uri_ticker": uri_ticker,
+    }
+    print(json.dumps(dict_out))
