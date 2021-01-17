@@ -2,6 +2,7 @@
 import json
 import requests
 from datetime import datetime
+from simco_base import *
 
 uri_player = "https://www.simcompanies.com/api/v2/players/me/"
 uri_resource_60 = "https://www.simcompanies.com/api/v2/market/60"
@@ -20,4 +21,6 @@ if __name__ == '__main__':
         "ticker": dict_ticker,
         "uri_ticker": uri_ticker,
     }
-    print(json.dumps(dict_out))
+    json_ticker = json.dumps(dict_out)
+    print(json_ticker)
+    redis_list_push_fifo(redis_list_ticker, json_ticker, 100)

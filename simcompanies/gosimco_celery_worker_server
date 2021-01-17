@@ -1,0 +1,2 @@
+#!/bin/bash
+celery -A simco_celery worker --loglevel=INFO
