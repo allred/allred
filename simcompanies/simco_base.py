@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import json
 import os
+import re
 import redis
 import requests
 from datetime import datetime
@@ -181,8 +182,35 @@ def get_dict_ticker_from_api():
     else:
         print(f"failure: {r}")
 
-def parse_retail_modeling(model):
-    print(model)
+def retail_modeling_calculate(group_dict, price, saturation, amount=1):
+    """ example: (Math.pow(price*2.995075 + (-7.061656 + (saturation - 0.5)/0.455885), 2.000000)*0.748513 + 20.189612)*amount """
+    n1 = group_dict.get("num1")
+    n2 = group_dict.get("num2")
+    n3 = group_dict.get("num3")
+    n4 = group_dict.get("num4")
+    n5 = group_dict.get("num5")
+    n6 = group_dict.get("num6")
+    exp = group_dict.get("exponent")
+    units_per_hour = ((price*n1 + (n2 + (saturation - n3)/n4))**exp * n5 + n6)*amount
+    return units_per_hour
+
+def retail_modeling_parse(model):
+    """ example: (Math.pow(price*2.995075 + (-7.061656 + (saturation - 0.5)/0.455885), 2.000000)*0.748513 + 20.189612)*amount """
+    re_model = re.compile(r'''
+        ^.*?
+        (?P<num1>\d+\.\d+)
+        .*?(?P<num2>-*\d+\.\d+)
+        .*?(?P<num3>-*\d+\.\d+)
+        .*?(?P<num4>-*\d+\.\d+)
+        .*?(?P<exponent>-*\d+\.\d+)
+        .*?(?P<num5>-*\d+\.\d+)
+        .*?(?P<num6>-*\d+\.\d+)
+        .*
+    ''', re.VERBOSE)
+    m = re_model.search(model)
+    group_dict = m.groupdict()
+    assert len(group_dict.values()) == 7
+    return {k:float(v) for k,v in m.groupdict().items()}
 
 def print_stores():
     dict_ticker, datetime_simco_latest = get_dict_ticker()

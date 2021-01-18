@@ -17,11 +17,18 @@ def test_get_kinds_from_stores(capsys):
     #with capsys.disabled():
     #    print({"debug": d})
 
-def test_parse_retail_modeling(capsys):
+def test_retail_modeling_calculate(capsys):
     retail_modeling = "(Math.pow(price*2.995075 + (-7.061656 + (saturation - 0.5)/0.455885), 2.000000)*0.748513 + 20.189612)*amount"
-    r = parse_retail_modeling(retail_modeling)
-    with capsys.disabled():
-        print({"debug": type(r)})
+    price = 3.930373600259584
+    saturation = 0.8583561299159979
+    gd = retail_modeling_parse(retail_modeling)
+    r = retail_modeling_calculate(gd, price, saturation)
+    assert isinstance(r, float)
+
+def test_retail_modeling_parse(capsys):
+    retail_modeling = "(Math.pow(price*2.995075 + (-7.061656 + (saturation - 0.5)/0.455885), 2.000000)*0.748513 + 20.189612)*amount"
+    r = retail_modeling_parse(retail_modeling)
+    assert len(r.values()) == 7
 
 def test_redis_client(capsys):
     r = redis_client()
