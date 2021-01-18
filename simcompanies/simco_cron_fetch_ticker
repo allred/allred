@@ -1,0 +1,2 @@
+#!/bin/bash
+$HOME/gits/pyenv/versions/3.9.1/bin/python $HOME/gits/allred/simcompanies/fetch_ticker.py
