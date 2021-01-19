@@ -80,10 +80,40 @@ stores = [
                 "revenue_less_wages_per_unit": 16.10,
             },
             {
+                "name": "dress",
+                "kind": 62,
+                "units_sold_per_hour": 40.12,
+                "revenue_less_wages_per_unit": 19.16,
+            },
+            {
+                "name": "heels",
+                "kind": 63,
+                "units_sold_per_hour": 25.74,
+                "revenue_less_wages_per_unit": 22.53,
+            },
+            {
+                "name": "handbags",
+                "kind": 64,
+                "units_sold_per_hour": 15.52,
+                "revenue_less_wages_per_unit": 28.38,
+            },
+            {
                 "name": "sneakers",
                 "kind": 65,
                 "units_sold_per_hour": 26.08,
                 "revenue_less_wages_per_unit": 16.81,
+            },
+            {
+                "name": "lux_watch",
+                "kind": 70,
+                "units_sold_per_hour": 2.33,
+                "revenue_less_wages_per_unit": 757.96,
+            },
+            {
+                "name": "necklace",
+                "kind": 71,
+                "units_sold_per_hour": 1.28,
+                "revenue_less_wages_per_unit": 1497.97,
             },
         ],
     },
@@ -124,6 +154,12 @@ stores = [
                 "kind": 4,
                 "units_sold_per_hour": 64.94,
                 "revenue_less_wages_per_unit": 2.27,
+            },
+            {
+                "name": "grapes",
+                "kind": 5,
+                "units_sold_per_hour": 63.27,
+                "revenue_less_wages_per_unit": 2.76,
             },
             {
                 "name": "eggs",
@@ -215,6 +251,10 @@ def retail_modeling_parse(model):
 def print_stores():
     dict_ticker, datetime_simco_latest = get_dict_ticker()
     print(f"{datetime_simco_latest} [profit per hour, exchange -> retail]")
+    try:
+        rc = redis_client()
+    except Exception as e:
+        print(f"FAILURE: {e}")
     for s in stores:
         profit_per_hour = {}
         for k in s['kinds']:
@@ -225,6 +265,20 @@ def print_stores():
             market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000)
             exchange_cost_to_fill_one_hour = k['units_sold_per_hour'] * market_price_per_unit
             profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
+            if False and rc:
+                json_res = rc.hget("simco:resources", f"{k['kind']}:json")
+                if json_res:
+                    json_res = json.loads(json_res)
+                    retail_modeling = json_res["retailModeling"]
+                    average_retail_price = json_res["averageRetailPrice"]
+                    market_saturation = json_res["marketSaturation"]
+                    hash_formula = retail_modeling_parse(retail_modeling)
+                    units_sold_per_hour = retail_modeling_calculate(hash_formula, average_retail_price, market_saturation, 100)
+                    print(f"[DEBUG: {k['name']}:{k['kind']} usph={round(units_sold_per_hour,2)} arp={round(average_retail_price,2)} sat={round(market_saturation,2)}]")
+                    revenue_per_hour = units_sold_per_hour * k['revenue_less_wages_per_unit']
+                else:
+                    print(f"no redis data for {k['name']}")
+        profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
         d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1], reverse=True))
         print(f"  {s['name']} {d_sorted}")
 
