@@ -42,6 +42,23 @@ stores = [
         ],
     },
     {
+        "name": "gas",
+        "kinds": [
+            {
+                "name": "petrol",
+                "kind": 11,
+                "units_sold_per_hour": 82.42,
+                "revenue_less_wages_per_unit": 41.10,
+            },
+            {
+                "name": "diesel",
+                "kind": 12,
+                "units_sold_per_hour": 79.52,
+                "revenue_less_wages_per_unit": 40.83,
+            },
+        ],
+    },
+    {
         "name": "electronics",
         "kinds": [
             {
@@ -49,6 +66,18 @@ stores = [
                 "kind": 24,
                 "units_sold_per_hour": 1.57,
                 "revenue_less_wages_per_unit": 650.11,
+            },
+            {
+                "name": "tablets",
+                "kind": 25,
+                "units_sold_per_hour": .56,
+                "revenue_less_wages_per_unit": 836.65,
+            },
+            {
+                "name": "laptops",
+                "kind": 26,
+                "units_sold_per_hour": .78,
+                "revenue_less_wages_per_unit": 1256.95,
             },
             {
                 "name": "monitors",
@@ -61,6 +90,12 @@ stores = [
                 "kind": 28,
                 "units_sold_per_hour": 1.37,
                 "revenue_less_wages_per_unit": 953.78,
+            },
+            {
+                "name": "quadcopter",
+                "kind": 98,
+                "units_sold_per_hour": .7,
+                "revenue_less_wages_per_unit": 937.64,
             },
         ],
     },
@@ -152,20 +187,32 @@ stores = [
             {
                 "name": "oranges",
                 "kind": 4,
-                "units_sold_per_hour": 64.94,
-                "revenue_less_wages_per_unit": 2.27,
+                "units_sold_per_hour": 63.42,
+                "revenue_less_wages_per_unit": 2.24,
             },
             {
                 "name": "grapes",
                 "kind": 5,
-                "units_sold_per_hour": 63.27,
-                "revenue_less_wages_per_unit": 2.76,
+                "units_sold_per_hour": 63.19,
+                "revenue_less_wages_per_unit": 2.73,
+            },
+            {
+                "name": "steak",
+                "kind": 7,
+                "units_sold_per_hour": 20.76,
+                "revenue_less_wages_per_unit": 11.76,
             },
             {
                 "name": "eggs",
                 "kind": 9,
                 "units_sold_per_hour": 290.79,
                 "revenue_less_wages_per_unit": 1.21,
+            },
+            {
+                "name": "sausages",
+                "kind": 8,
+                "units_sold_per_hour": 80.41,
+                "revenue_less_wages_per_unit": 3.90,
             },
         ],
     },
@@ -280,11 +327,11 @@ def print_stores():
                     print(f"no redis data for {k['name']}")
         profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
         d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1], reverse=True))
-        print(f"  {s['name']} {d_sorted}")
+        print(f"  [{s['name'].upper()}] {d_sorted}")
 
 def get_kinds_from_stores():
     kinds = {}
     for s in stores:
         for k in s.get("kinds"):
-            kinds[k.get("kind")] = k.get("name") 
+            kinds[k.get("kind")] = k.get("name")
     return kinds
