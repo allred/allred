@@ -19,8 +19,11 @@ uri_api_ticker_base = f"{uri_api_base_v1}/market-ticker/"
 uri_player = "https://www.simcompanies.com/api/v2/players/me/"
 uri_resource_60 = "https://www.simcompanies.com/api/v2/market/60"
 
-logging.basicConfig(format='%(asctime)s %(message)s')
-
+silog = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(message)s',
+)
 
 # get these values from the Encyclopedia
 stores = [
@@ -229,13 +232,8 @@ class Simco:
         """ breakfast style logging """
         logging.warning(msg)
 
-def silog(msg):
-   """ breakfast style logging """
-   logging.warning(msg)
-
 def print_stores():
     simco = Simco()
-    print(simco)
     #simco.silog('silog loggarooba')
     dict_ticker, datetime_simco_latest = get_dict_ticker_from_log()
     print(f"{datetime_simco_latest} [profit per hour, exchange -> retail]")
@@ -245,11 +243,13 @@ def print_stores():
         print(f"FAILURE: {e}")
     for s in stores:
         profit_per_hour = {}
+        kinds_not_found = [] 
         for k in s['kinds']:
             revenue_per_hour = k['units_sold_per_hour'] * k['revenue_less_wages_per_unit']
             kind = k.get("kind")
             if not kind in dict_ticker:
-                logging.debug(f"WARNING: name={k.get('name')} kind={kind} not in ticker")
+                kinds_not_found.append(kind)
+                pass
             market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000)
             exchange_cost_to_fill_one_hour = k['units_sold_per_hour'] * market_price_per_unit
             profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
@@ -266,6 +266,8 @@ def print_stores():
                     revenue_per_hour = units_sold_per_hour * k['revenue_less_wages_per_unit']
                 else:
                     print(f"no redis data for {k['name']}")
+        if len(kinds_not_found) > 0:
+            logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
         profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
         d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1], reverse=True))
         print(f"  [{s['name'].upper()}] {d_sorted}")
@@ -299,21 +301,25 @@ def get_dict_ticker_from_log():
     datetime_simco_latest = "unknown"
     dict_ticker = {}
     line_count = 0
-    success = False
-    for line in open(path_log, "r").readlines():
-        print(line)
-        if success:
-            continue
+    fh = open(path_log, "r")
+    found_json_in_file = False
+    datetime_simco_latest = 'UNKNOWN'
+    for line in fh.readlines():
+        if found_json_in_file:
+            break
         h = {"ticker": []}
         try:
             h = json.loads(line)
             dict_ticker = {t['kind']:t['price'] for t in h['ticker']}
-            success = True
+            datetime_simco_latest = h.get("uri_ticker").split("/")[-2]
+            found_json_in_file = True
         except Exception as e:
-            logging.error(f"json parse failure: {e} path_log: {path_log}")
-            return dict_ticker, "BROKEN" # take the first line
-        datetime_simco_latest = h.get("uri_ticker").split("/")[-2]
-    logging.warning(f"file has been read")
+            #logging.debug(f"json parse failure: {e} path_log: {path_log}")
+            #logging.debug(f"line: {line}")
+            #logging.debug(line)
+            pass
+    if not found_json_in_file:
+        logging.debug(f"read: {fh} {path_log}")
     return dict_ticker, datetime_simco_latest
 
 def request_dict_ticker_from_simco_http():

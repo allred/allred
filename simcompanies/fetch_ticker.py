@@ -12,11 +12,16 @@ if __name__ == '__main__':
     }
     json_ticker = json.dumps(dict_out)
     print(json_ticker)
+
+    logging.debug("pushing to redis")
     redis_list_push_fifo(redis_list_ticker, json_ticker, 50)
 
+    logging.debug("pushing to influxdb")
     bucket = "mikejallred's Bucket"
     client = influxdb_client()
     write_api = client.write_api(write_options=SYNCHRONOUS)
     for r in list_ticker:
         influx_line = f'ticker,kind={r["kind"]} price={r["price"]}'
         ir = write_api.write(bucket, org_influxdb, influx_line)
+
+    logging.debug("done")
