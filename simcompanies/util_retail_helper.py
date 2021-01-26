@@ -1,7 +1,11 @@
 #!/usr/bin/env python
-"""
+usage = f"""
 Usage: 
-    blah blah
+    {__file__} [-h] [-w]
+
+Options:
+    -h --help      Show this screen.
+    -w             Web output
 """
 import json
 import os
@@ -50,6 +54,32 @@ def print_stores():
     if len(kinds_not_found) > 0:
         logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
 
-if __name__ == '__main__':
-    args = docopt(__doc__, version='665')
+def print_stores_web():
+    html_start = """
+<!DOCTYPE html>
+<html>
+  <head>
+        <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  </head>
+  <body>
+    <pre><code>
+"""
+    print(html_start)
     print_stores()
+    print("""
+    </code></pre>
+  </body>
+</html>
+""")
+
+if __name__ == '__main__':
+    args = docopt(usage, version='665')
+    #print(args)
+    if args.get("-w"):
+        print_stores_web()
+    else:
+        print_stores()
