@@ -233,6 +233,7 @@ class Simco:
         logging.warning(msg)
 
 def print_stores():
+    logging.debug("logging test")
     simco = Simco()
     #simco.silog('silog loggarooba')
     dict_ticker, datetime_simco_latest = get_dict_ticker_from_log()
@@ -266,11 +267,11 @@ def print_stores():
                     revenue_per_hour = units_sold_per_hour * k['revenue_less_wages_per_unit']
                 else:
                     print(f"no redis data for {k['name']}")
-        if len(kinds_not_found) > 0:
-            logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
         profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
         d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1], reverse=True))
         print(f"  [{s['name'].upper()}] {d_sorted}")
+    if len(kinds_not_found) > 0:
+        logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
 
 
 def redis_client():
@@ -319,6 +320,7 @@ def get_dict_ticker_from_log():
             #logging.debug(line)
             pass
     if not found_json_in_file:
+        logging.debug(f"didn't find json in file")
         logging.debug(f"read: {fh} {path_log}")
     return dict_ticker, datetime_simco_latest
 
