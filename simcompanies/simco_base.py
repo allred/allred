@@ -232,48 +232,6 @@ class Simco:
         """ breakfast style logging """
         logging.warning(msg)
 
-def print_stores():
-    logging.debug("logging test")
-    simco = Simco()
-    #simco.silog('silog loggarooba')
-    dict_ticker, datetime_simco_latest = get_dict_ticker_from_log()
-    print(f"{datetime_simco_latest} [profit per hour, exchange -> retail]")
-    try:
-        rc = redis_client()
-    except Exception as e:
-        print(f"FAILURE: {e}")
-    for s in stores:
-        profit_per_hour = {}
-        kinds_not_found = [] 
-        for k in s['kinds']:
-            revenue_per_hour = k['units_sold_per_hour'] * k['revenue_less_wages_per_unit']
-            kind = k.get("kind")
-            if not kind in dict_ticker:
-                kinds_not_found.append(kind)
-                pass
-            market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000)
-            exchange_cost_to_fill_one_hour = k['units_sold_per_hour'] * market_price_per_unit
-            profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
-            if False and rc:
-                json_res = rc.hget("simco:resources", f"{k['kind']}:json")
-                if json_res:
-                    json_res = json.loads(json_res)
-                    retail_modeling = json_res["retailModeling"]
-                    average_retail_price = json_res["averageRetailPrice"]
-                    market_saturation = json_res["marketSaturation"]
-                    hash_formula = retail_modeling_parse(retail_modeling)
-                    units_sold_per_hour = retail_modeling_calculate(hash_formula, average_retail_price, market_saturation, 100)
-                    print(f"[DEBUG: {k['name']}:{k['kind']} usph={round(units_sold_per_hour,2)} arp={round(average_retail_price,2)} sat={round(market_saturation,2)}]")
-                    revenue_per_hour = units_sold_per_hour * k['revenue_less_wages_per_unit']
-                else:
-                    print(f"no redis data for {k['name']}")
-        profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
-        d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1], reverse=True))
-        print(f"  [{s['name'].upper()}] {d_sorted}")
-    if len(kinds_not_found) > 0:
-        logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
-
-
 def redis_client():
     r = redis.Redis.from_url(uri_redis)
     return r
@@ -311,13 +269,12 @@ def get_dict_ticker_from_log():
         h = {"ticker": []}
         try:
             h = json.loads(line)
+            #logging.debug(f"json parse result: {h}")
             dict_ticker = {t['kind']:t['price'] for t in h['ticker']}
             datetime_simco_latest = h.get("uri_ticker").split("/")[-2]
             found_json_in_file = True
         except Exception as e:
-            #logging.debug(f"json parse failure: {e} path_log: {path_log}")
-            #logging.debug(f"line: {line}")
-            #logging.debug(line)
+            #logging.debug(f"json parse failure: error:{e} path_log:{path_log} line:{line}")
             pass
     if not found_json_in_file:
         logging.debug(f"didn't find json in file")
