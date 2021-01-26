@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+# [SIMCO BASE]
+# ALL YOUR OCMIS ARE BELONG TO US
 import json
+import logging
 import os
 import re
 import redis
@@ -16,207 +19,257 @@ uri_api_ticker_base = f"{uri_api_base_v1}/market-ticker/"
 uri_player = "https://www.simcompanies.com/api/v2/players/me/"
 uri_resource_60 = "https://www.simcompanies.com/api/v2/market/60"
 
+logging.basicConfig(format='%(asctime)s %(message)s')
+
+
 # get these values from the Encyclopedia
 stores = [
+        {
+            "name": "car_dealership",
+            "kinds": [
+                {
+                    "name": "economy_car",
+                    "kind": 55,
+                    "units_sold_per_hour": 1.63,
+                    "revenue_less_wages_per_unit": 2271.38,
+                    },
+                {
+                    "name": "economy_e_car",
+                    "kind": 53,
+                    "units_sold_per_hour": 1.30,
+                    "revenue_less_wages_per_unit": 3393.78,
+                    },
+                {
+                    "name": "truck",
+                    "kind": 57,
+                    "units_sold_per_hour": 0.66,
+                    "revenue_less_wages_per_unit": 5696.20,
+                    },
+                ],
+            },
+        {
+            "name": "gas",
+            "kinds": [
+                {
+                    "name": "petrol",
+                    "kind": 11,
+                    "units_sold_per_hour": 82.42,
+                    "revenue_less_wages_per_unit": 41.10,
+                    },
+                {
+                    "name": "diesel",
+                    "kind": 12,
+                    "units_sold_per_hour": 79.52,
+                    "revenue_less_wages_per_unit": 40.83,
+                    },
+                ],
+            },
+        {
+            "name": "electronics",
+            "kinds": [
+                {
+                    "name": "smart_phones",
+                    "kind": 24,
+                    "units_sold_per_hour": 1.57,
+                    "revenue_less_wages_per_unit": 650.11,
+                    },
+                {
+                    "name": "tablets",
+                    "kind": 25,
+                    "units_sold_per_hour": .56,
+                    "revenue_less_wages_per_unit": 836.65,
+                    },
+                {
+                    "name": "laptops",
+                    "kind": 26,
+                    "units_sold_per_hour": .78,
+                    "revenue_less_wages_per_unit": 1256.95,
+                    },
+                {
+                    "name": "monitors",
+                    "kind": 27,
+                    "units_sold_per_hour": 1.28,
+                    "revenue_less_wages_per_unit": 574.46,
+                    },
+                {
+                    "name": "tvs",
+                    "kind": 28,
+                    "units_sold_per_hour": 1.37,
+                    "revenue_less_wages_per_unit": 953.78,
+                    },
+                {
+                    "name": "quadcopter",
+                    "kind": 98,
+                    "units_sold_per_hour": .7,
+                    "revenue_less_wages_per_unit": 937.64,
+                    },
+                ],
+            },
+        {
+                "name": "fashion",
+                "kinds": [
+                    {
+                        "name": "underwear",
+                        "kind": 60,
+                        "units_sold_per_hour": 23.00,
+                        "revenue_less_wages_per_unit": 8.03,
+                        },
+                    {
+                        "name": "gloves",
+                        "kind": 61,
+                        "units_sold_per_hour": 16.90,
+                        "revenue_less_wages_per_unit": 16.10,
+                        },
+                    {
+                        "name": "dress",
+                        "kind": 62,
+                        "units_sold_per_hour": 40.12,
+                        "revenue_less_wages_per_unit": 19.16,
+                        },
+                    {
+                        "name": "heels",
+                        "kind": 63,
+                        "units_sold_per_hour": 25.74,
+                        "revenue_less_wages_per_unit": 22.53,
+                        },
+                    {
+                        "name": "handbags",
+                        "kind": 64,
+                        "units_sold_per_hour": 15.52,
+                        "revenue_less_wages_per_unit": 28.38,
+                        },
+                    {
+                        "name": "sneakers",
+                        "kind": 65,
+                        "units_sold_per_hour": 26.08,
+                        "revenue_less_wages_per_unit": 16.81,
+                        },
+                    {
+                        "name": "lux_watch",
+                        "kind": 70,
+                        "units_sold_per_hour": 2.33,
+                        "revenue_less_wages_per_unit": 757.96,
+                        },
+                    {
+                        "name": "necklace",
+                        "kind": 71,
+                        "units_sold_per_hour": 1.28,
+                        "revenue_less_wages_per_unit": 1497.97,
+                        },
+                    ],
+                },
     {
-        "name": "car_dealership",
-        "kinds": [
-            {
-                "name": "economy_car",
-                "kind": 55,
-                "units_sold_per_hour": 1.63,
-                "revenue_less_wages_per_unit": 2271.38,
+            "name": "hardware",
+            "kinds": [
+                {
+                    "name": "bricks",
+                    "kind": 102,
+                    "units_sold_per_hour": 75.85,
+                    "revenue_less_wages_per_unit": 3.50,
+                    },
+                {
+                    "name": "cement",
+                    "kind": 103,
+                    "units_sold_per_hour": 55.22,
+                    "revenue_less_wages_per_unit": 7.35,
+                    },
+                {
+                    "name": "planks",
+                    "kind": 108,
+                    "units_sold_per_hour": 99.09,
+                    "revenue_less_wages_per_unit": 10.04,
+                    },
+                ],
             },
-            {
-                "name": "economy_e_car",
-                "kind": 53,
-                "units_sold_per_hour": 1.30,
-                "revenue_less_wages_per_unit": 3393.78,
-            },
-            {
-                "name": "truck",
-                "kind": 57,
-                "units_sold_per_hour": 0.66,
-                "revenue_less_wages_per_unit": 5696.20,
-            },
-        ],
-    },
     {
-        "name": "gas",
-        "kinds": [
-            {
-                "name": "petrol",
-                "kind": 11,
-                "units_sold_per_hour": 82.42,
-                "revenue_less_wages_per_unit": 41.10,
+            "name": "grocery",
+            "kinds": [
+                {
+                    "name": "apples",
+                    "kind": 3,
+                    "units_sold_per_hour": 85.84,
+                    "revenue_less_wages_per_unit": 2.18,
+                    },
+                {
+                    "name": "oranges",
+                    "kind": 4,
+                    "units_sold_per_hour": 63.42,
+                    "revenue_less_wages_per_unit": 2.24,
+                    },
+                {
+                    "name": "grapes",
+                    "kind": 5,
+                    "units_sold_per_hour": 63.19,
+                    "revenue_less_wages_per_unit": 2.73,
+                    },
+                {
+                    "name": "steak",
+                    "kind": 7,
+                    "units_sold_per_hour": 20.76,
+                    "revenue_less_wages_per_unit": 11.76,
+                    },
+                {
+                    "name": "eggs",
+                    "kind": 9,
+                    "units_sold_per_hour": 290.79,
+                    "revenue_less_wages_per_unit": 1.21,
+                    },
+                {
+                    "name": "sausages",
+                    "kind": 8,
+                    "units_sold_per_hour": 80.41,
+                    "revenue_less_wages_per_unit": 3.90,
+                    },
+                ],
             },
-            {
-                "name": "diesel",
-                "kind": 12,
-                "units_sold_per_hour": 79.52,
-                "revenue_less_wages_per_unit": 40.83,
-            },
-        ],
-    },
-    {
-        "name": "electronics",
-        "kinds": [
-            {
-                "name": "smart_phones",
-                "kind": 24,
-                "units_sold_per_hour": 1.57,
-                "revenue_less_wages_per_unit": 650.11,
-            },
-            {
-                "name": "tablets",
-                "kind": 25,
-                "units_sold_per_hour": .56,
-                "revenue_less_wages_per_unit": 836.65,
-            },
-            {
-                "name": "laptops",
-                "kind": 26,
-                "units_sold_per_hour": .78,
-                "revenue_less_wages_per_unit": 1256.95,
-            },
-            {
-                "name": "monitors",
-                "kind": 27,
-                "units_sold_per_hour": 1.28,
-                "revenue_less_wages_per_unit": 574.46,
-            },
-            {
-                "name": "tvs",
-                "kind": 28,
-                "units_sold_per_hour": 1.37,
-                "revenue_less_wages_per_unit": 953.78,
-            },
-            {
-                "name": "quadcopter",
-                "kind": 98,
-                "units_sold_per_hour": .7,
-                "revenue_less_wages_per_unit": 937.64,
-            },
-        ],
-    },
-    {
-        "name": "fashion",
-        "kinds": [
-            {
-                "name": "underwear",
-                "kind": 60,
-                "units_sold_per_hour": 23.00,
-                "revenue_less_wages_per_unit": 8.03,
-            },
-            {
-                "name": "gloves",
-                "kind": 61,
-                "units_sold_per_hour": 16.90,
-                "revenue_less_wages_per_unit": 16.10,
-            },
-            {
-                "name": "dress",
-                "kind": 62,
-                "units_sold_per_hour": 40.12,
-                "revenue_less_wages_per_unit": 19.16,
-            },
-            {
-                "name": "heels",
-                "kind": 63,
-                "units_sold_per_hour": 25.74,
-                "revenue_less_wages_per_unit": 22.53,
-            },
-            {
-                "name": "handbags",
-                "kind": 64,
-                "units_sold_per_hour": 15.52,
-                "revenue_less_wages_per_unit": 28.38,
-            },
-            {
-                "name": "sneakers",
-                "kind": 65,
-                "units_sold_per_hour": 26.08,
-                "revenue_less_wages_per_unit": 16.81,
-            },
-            {
-                "name": "lux_watch",
-                "kind": 70,
-                "units_sold_per_hour": 2.33,
-                "revenue_less_wages_per_unit": 757.96,
-            },
-            {
-                "name": "necklace",
-                "kind": 71,
-                "units_sold_per_hour": 1.28,
-                "revenue_less_wages_per_unit": 1497.97,
-            },
-        ],
-    },
-    {
-        "name": "hardware",
-        "kinds": [
-            {
-                "name": "bricks",
-                "kind": 102,
-                "units_sold_per_hour": 75.85,
-                "revenue_less_wages_per_unit": 3.50,
-            },
-            {
-                "name": "cement",
-                "kind": 103,
-                "units_sold_per_hour": 55.22,
-                "revenue_less_wages_per_unit": 7.35,
-            },
-            {
-                "name": "planks",
-                "kind": 108,
-                "units_sold_per_hour": 99.09,
-                "revenue_less_wages_per_unit": 10.04,
-            },
-        ],
-    },
-    {
-        "name": "grocery",
-        "kinds": [
-            {
-                "name": "apples",
-                "kind": 3,
-                "units_sold_per_hour": 85.84,
-                "revenue_less_wages_per_unit": 2.18,
-            },
-            {
-                "name": "oranges",
-                "kind": 4,
-                "units_sold_per_hour": 63.42,
-                "revenue_less_wages_per_unit": 2.24,
-            },
-            {
-                "name": "grapes",
-                "kind": 5,
-                "units_sold_per_hour": 63.19,
-                "revenue_less_wages_per_unit": 2.73,
-            },
-            {
-                "name": "steak",
-                "kind": 7,
-                "units_sold_per_hour": 20.76,
-                "revenue_less_wages_per_unit": 11.76,
-            },
-            {
-                "name": "eggs",
-                "kind": 9,
-                "units_sold_per_hour": 290.79,
-                "revenue_less_wages_per_unit": 1.21,
-            },
-            {
-                "name": "sausages",
-                "kind": 8,
-                "units_sold_per_hour": 80.41,
-                "revenue_less_wages_per_unit": 3.90,
-            },
-        ],
-    },
-]
+    ]
+
+class Simco:
+    def silog(msg):
+        """ breakfast style logging """
+        logging.warning(msg)
+
+def silog(msg):
+   """ breakfast style logging """
+   logging.warning(msg)
+
+def print_stores():
+    simco = Simco()
+    print(simco)
+    #simco.silog('silog loggarooba')
+    dict_ticker, datetime_simco_latest = get_dict_ticker_from_log()
+    print(f"{datetime_simco_latest} [profit per hour, exchange -> retail]")
+    try:
+        rc = redis_client()
+    except Exception as e:
+        print(f"FAILURE: {e}")
+    for s in stores:
+        profit_per_hour = {}
+        for k in s['kinds']:
+            revenue_per_hour = k['units_sold_per_hour'] * k['revenue_less_wages_per_unit']
+            kind = k.get("kind")
+            if not kind in dict_ticker:
+                logging.debug(f"WARNING: name={k.get('name')} kind={kind} not in ticker")
+            market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000)
+            exchange_cost_to_fill_one_hour = k['units_sold_per_hour'] * market_price_per_unit
+            profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
+            if False and rc:
+                json_res = rc.hget("simco:resources", f"{k['kind']}:json")
+                if json_res:
+                    json_res = json.loads(json_res)
+                    retail_modeling = json_res["retailModeling"]
+                    average_retail_price = json_res["averageRetailPrice"]
+                    market_saturation = json_res["marketSaturation"]
+                    hash_formula = retail_modeling_parse(retail_modeling)
+                    units_sold_per_hour = retail_modeling_calculate(hash_formula, average_retail_price, market_saturation, 100)
+                    print(f"[DEBUG: {k['name']}:{k['kind']} usph={round(units_sold_per_hour,2)} arp={round(average_retail_price,2)} sat={round(market_saturation,2)}]")
+                    revenue_per_hour = units_sold_per_hour * k['revenue_less_wages_per_unit']
+                else:
+                    print(f"no redis data for {k['name']}")
+        profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
+        d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1], reverse=True))
+        print(f"  [{s['name'].upper()}] {d_sorted}")
+
 
 def redis_client():
     r = redis.Redis.from_url(uri_redis)
@@ -233,7 +286,7 @@ def redis_hset_resource(resource_num, payload):
     n = r.hmset("simco:resources", {
         f"{resource_num}:json": json.dumps(payload),
         f"{resource_num}:datetime": str(datetime.now()),
-    })
+        })
     return n
 
 def request_resource_from_api(resource_num):
@@ -241,21 +294,29 @@ def request_resource_from_api(resource_num):
     r = requests.get(uri)
     return r
 
-def get_dict_ticker():
+def get_dict_ticker_from_log():
     path_log = f"{os.environ['HOME']}/log/simco_cron_fetch_ticker.log"
     datetime_simco_latest = "unknown"
     dict_ticker = {}
+    line_count = 0
+    success = False
     for line in open(path_log, "r").readlines():
-        h = {}
+        print(line)
+        if success:
+            continue
+        h = {"ticker": []}
         try:
             h = json.loads(line)
+            dict_ticker = {t['kind']:t['price'] for t in h['ticker']}
+            success = True
         except Exception as e:
-            print(f"JSON PARSE FAILURE: {e}")
-        dict_ticker = {t['kind']:t['price'] for t in h['ticker']}
+            logging.error(f"json parse failure: {e} path_log: {path_log}")
+            return dict_ticker, "BROKEN" # take the first line
         datetime_simco_latest = h.get("uri_ticker").split("/")[-2]
+    logging.warning(f"file has been read")
     return dict_ticker, datetime_simco_latest
 
-def get_dict_ticker_from_api():
+def request_dict_ticker_from_simco_http():
     datetime_now = datetime.now()
     datetime_simco = datetime_now.strftime('%Y-%m-%dT%H:%M:%S.000')
     uri_ticker = f'{uri_api_ticker_base}{datetime_simco}Z/'
@@ -295,39 +356,6 @@ def retail_modeling_parse(model):
     assert len(group_dict.values()) == 7
     return {k:float(v) for k,v in m.groupdict().items()}
 
-def print_stores():
-    dict_ticker, datetime_simco_latest = get_dict_ticker()
-    print(f"{datetime_simco_latest} [profit per hour, exchange -> retail]")
-    try:
-        rc = redis_client()
-    except Exception as e:
-        print(f"FAILURE: {e}")
-    for s in stores:
-        profit_per_hour = {}
-        for k in s['kinds']:
-            revenue_per_hour = k['units_sold_per_hour'] * k['revenue_less_wages_per_unit']
-            kind = k.get("kind")
-            if not kind in dict_ticker:
-                print(f"WARNING: name={k.get('name')} kind={kind} not in ticker")
-            market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000)
-            exchange_cost_to_fill_one_hour = k['units_sold_per_hour'] * market_price_per_unit
-            profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
-            if False and rc:
-                json_res = rc.hget("simco:resources", f"{k['kind']}:json")
-                if json_res:
-                    json_res = json.loads(json_res)
-                    retail_modeling = json_res["retailModeling"]
-                    average_retail_price = json_res["averageRetailPrice"]
-                    market_saturation = json_res["marketSaturation"]
-                    hash_formula = retail_modeling_parse(retail_modeling)
-                    units_sold_per_hour = retail_modeling_calculate(hash_formula, average_retail_price, market_saturation, 100)
-                    print(f"[DEBUG: {k['name']}:{k['kind']} usph={round(units_sold_per_hour,2)} arp={round(average_retail_price,2)} sat={round(market_saturation,2)}]")
-                    revenue_per_hour = units_sold_per_hour * k['revenue_less_wages_per_unit']
-                else:
-                    print(f"no redis data for {k['name']}")
-        profit_per_hour[k['name']] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
-        d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1], reverse=True))
-        print(f"  [{s['name'].upper()}] {d_sorted}")
 
 def get_kinds_from_stores():
     kinds = {}
