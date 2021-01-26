@@ -13,6 +13,7 @@ if __name__ == '__main__':
     }
     json_ticker = json.dumps(dict_out)
 
+    os.system('echo ""')
     print("")
     print(json_ticker)
     print("")
@@ -31,3 +32,4 @@ if __name__ == '__main__':
         ir = write_api.write(bucket, org_influxdb, influx_line)
 
     logging.debug("done")
+    print(json_ticker)

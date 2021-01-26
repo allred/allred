@@ -1,7 +1,12 @@
 #!/usr/bin/env python
+"""
+Usage: 
+    blah blah
+"""
 import json
 import os
 import sys
+from docopt import docopt
 from simco_base import *
 
 def print_stores():
@@ -46,4 +51,5 @@ def print_stores():
         logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
 
 if __name__ == '__main__':
+    args = docopt(__doc__, version='665')
     print_stores()
