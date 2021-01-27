@@ -3,6 +3,17 @@
 # get these values from the Encyclopedia
 stores = [
         {
+            "name": "sales_office",
+            "kinds": [
+                {
+                    "name": "bfr",
+                    "kind": 94,
+                    "units_sold_per_hour": 0.21,
+                    "revenue_less_wages_per_unit": 2271.38,
+                },
+            ]
+        },
+        {
             "name": "car_dealership",
             "kinds": [
                 {

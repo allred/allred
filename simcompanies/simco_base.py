@@ -75,7 +75,7 @@ def get_dict_ticker_from_log():
         except Exception as e:
             #logging.debug(f"json parse failure: error:{e} path_log:{path_log} line:{line}")
             pass
-    if not found_json_in_file:
+    if found_json_in_file is not True:
         logging.debug(f"didn't find json in file")
         logging.debug(f"read: {fh} {path_log}")
     return dict_ticker, datetime_simco_latest
