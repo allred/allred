@@ -10,6 +10,8 @@ Options:
 import json
 import os
 import sys
+import time
+from datetime import datetime
 from docopt import docopt
 from simco_base import *
 
@@ -97,7 +99,8 @@ def print_stores_web():
             header_printed = True
 
     print(f"""
-    <h1>{dict_header['t']}</h1>
+    <h2>{dict_header['t']}</h2>
+    <h2><script>document.write("generated " + Math.floor(Math.floor(Date.now()/1000 - {time.time()}) / 60) + "m ago")</script></h2>
     </div>
   </body>
 </html>

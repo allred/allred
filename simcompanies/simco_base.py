@@ -81,8 +81,9 @@ def get_dict_ticker_from_log():
     return dict_ticker, datetime_simco_latest
 
 def request_dict_ticker_from_simco_http():
-    # date is often slightly in the past
-    datetime_past = datetime.now() - timedelta(minutes=10)
+    # date needs to be slightly in the past
+    minutes_in_the_past = 80
+    datetime_past = datetime.now() - timedelta(minutes=minutes_in_the_past)
     datetime_simco = datetime_past.strftime('%Y-%m-%dT%H:%M:%S.000')
     uri_ticker = f'{uri_api_ticker_base}{datetime_simco}Z/'
     r = requests.get(uri_ticker)
