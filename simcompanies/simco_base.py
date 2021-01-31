@@ -7,7 +7,7 @@ import os
 import re
 import redis
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from simco_stores import stores
 
 token_redis = os.environ["SIMCO_REDIS_TOKEN"]
@@ -81,12 +81,11 @@ def get_dict_ticker_from_log():
     return dict_ticker, datetime_simco_latest
 
 def request_dict_ticker_from_simco_http():
-    datetime_now = datetime.now()
-    #datetime_simco = datetime_now.strftime('%Y-%m-%dT%H:%M:%S.000')
-    # date is slightly in the past
-    datetime_simco = datetime_now.strftime('%Y-%m-%dT%H:%M:00.000')
+    # date is often slightly in the past
+    datetime_past = datetime.now() - timedelta(minutes=10)
+    datetime_simco = datetime_past.strftime('%Y-%m-%dT%H:%M:%S.000')
     uri_ticker = f'{uri_api_ticker_base}{datetime_simco}Z/'
-    r = requests.get(uri_ticker)
+    r = requests.get(uri_ticker, headers=headers)
     if r.ok:
         return r, uri_ticker
     else:
