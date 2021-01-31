@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# stdout and stdin alternate, so beware
 import os
 from simco_base import *
 from simco_influxdb import *
