@@ -1,5 +1,11 @@
 #!/bin/bash
+if [ "$HOSTNAME" = "wyvern" ]; then
+    python="$HOME/gits/pyenv/versions/3.9.1/bin/python"
+else
+    python="$HOME/.pyenv/versions/3.9.1/bin/python"
+fi
+
 file_tmp_retail="/tmp/simco_retail.html"
 base_simco="$HOME/gits/allred/simcompanies"
-$HOME/gits/pyenv/versions/3.9.1/bin/python $base_simco/util_retail_helper.py -w | tee $file_tmp_retail 
+$python $base_simco/util_retail_helper.py -w | tee $file_tmp_retail
 rsync --timeout 60 -arvz -e "ssh -o StrictHostKeyChecking=no" -i $SIMCO_PATH_PEM $file_tmp_retail ubuntu@mikeallred.com:/var/www/presence/public
