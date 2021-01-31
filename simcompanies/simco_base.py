@@ -85,7 +85,7 @@ def request_dict_ticker_from_simco_http():
     datetime_past = datetime.now() - timedelta(minutes=10)
     datetime_simco = datetime_past.strftime('%Y-%m-%dT%H:%M:%S.000')
     uri_ticker = f'{uri_api_ticker_base}{datetime_simco}Z/'
-    r = requests.get(uri_ticker, headers=headers)
+    r = requests.get(uri_ticker)
     if r.ok:
         return r, uri_ticker
     else:
