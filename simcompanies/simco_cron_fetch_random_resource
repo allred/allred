@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -eu -o pipefail
 if [ "$HOSTNAME" = "wyvern" ]; then
     python="$HOME/gits/pyenv/versions/3.9.1/bin/python"
 else
