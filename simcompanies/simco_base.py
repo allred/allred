@@ -7,6 +7,7 @@ import os
 import re
 import redis
 import requests
+from collections import defaultdict
 from datetime import datetime, timedelta
 from simco_stores import stores
 
