@@ -15,6 +15,32 @@ from datetime import datetime
 from docopt import docopt
 from simco_base import *
 
+"""
+const timeModeling = (retailModeling, saturation, amount, price) => eval(retailModeling);
+
+const timeToSellUnits = (quantity, salesModifier, price, quality, marketSaturation, retailModeling) => {
+  const qAllowance = 2;
+
+  const adjusted_market_saturation = Math.max(marketSaturation - quality*0.24, 0.1 - 0.24*qAllowance);
+
+  const tts = timeModeling(retailModeling, adjusted_market_saturation, quantity, price);
+
+  return Math.ceil(tts - tts*salesModifier/100.0);
+
+};
+
+const unitsSoldAnHour = (salesModifier, price, quality, marketSaturation, retailModeling) => {
+
+  const secondsToProduce100units = timeToSellUnits(100, salesModifier, price, quality, marketSaturation, retailModeling);
+
+  return 100*3600/secondsToProduce100units;
+
+};
+
+
+"""
+
+
 def gen_stores():
     out_report = []
     simco = Simco()
