@@ -7,8 +7,7 @@ from simco_influxdb import *
 def push_to_redis():
     redis_list_push_fifo(redis_list_ticker, json_ticker, 50)
 
-def write_to_influxdb():
-    bucket = "mikejallred's Bucket"
+def write_to_influxdb(bucket):
     client = influxdb_client()
     write_api = client.write_api(write_options=SYNCHRONOUS)
     list_write_to_influx = []
@@ -41,11 +40,12 @@ if __name__ == '__main__':
         res_red = push_to_redis()
     except Exception as e:
         print(e)
-    logging.debug(f"redis push done: {res_red}")
+    logging.debug(f"redis->{redis_list_ticker} push done: {res_red}")
 
-    logging.debug("influxdb write start")
+    bucket_influxdb = "simco"
+    logging.debug(f"influxdb->{bucket_influxdb} write start")
     try:
-        res_inf = write_to_influxdb()
+        res_inf = write_to_influxdb(bucket_influxdb)
     except Exception as e:
         print(e)
     logging.debug(f"influxdb write done: {res_inf}")
