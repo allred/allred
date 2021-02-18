@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 usage = f"""
-Usage: 
+Usage:
     {__file__} [-h] [-w]
 
 Options:
@@ -135,8 +135,18 @@ def print_stores_web():
             header_printed = True
 
     print(f"""
-    <h2>{dict_header['t']}</h2>
+    <!--h2>{dict_header['t']}</h2-->
     <h2><script>document.write("generated " + Math.floor(Math.floor(Date.now()/1000 - {time.time()}) / 60) + "m ago")</script></h2>
+
+    <!--
+    <h2><a href="https://snapshot.raintank.io/dashboard/snapshot/bkvCQJyglvsj6scy3jz6x3BV867kFZn6">snapshot</a></h2>
+
+    <iframe src="https://piloto.grafana.net/d-solo/6M9c_9EGz/rp2-system-blah?orgId=1&from=1613613580262&to=1613635180262&panelId=2" width="450" height="200" frameborder="0"></iframe>
+
+    <h2>img</h2>
+    <img src="https://piloto.grafana.net/render/d-solo/6M9c_9EGz/rp2-system-blah?orgId=1&from=1613631456634&to=1613635056634&panelId=2&width=1000&height=500&tz=America%2FNew_York">
+    -->
+
     </div>
   </body>
 </html>
