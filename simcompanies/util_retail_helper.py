@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 usage = f"""
 Usage:
-    {__file__} [-h] [-w]
+    {__file__} [-h] [-d] [-r] [-w]
 
 Options:
     -h --help      Show this screen.
+    -d             Debug mode.
+    -r             Redis mode. Source resources from redis.
     -w             Web output
 """
 import json
+import math
 import os
 import sys
 import time
@@ -40,6 +43,17 @@ const unitsSoldAnHour = (salesModifier, price, quality, marketSaturation, retail
 
 """
 
+# salesModifier comes from authUser (me.json ie, 3 for me, ie +3%)
+def time_to_sell_units(quantity, salesModifier, price, quality, marketSaturation, retailModeling):
+    qAllowance = 2
+    adjusted_market_saturation = max(marketSaturation - quality*0.24, 0.1 - 0.24*qAllowance)
+    tts = retailModeling
+    rvalue = math.ceil(tts - tts*salesModifier/100)
+    return rvalue
+
+def units_sold_an_hour(salesModifier, price, quality, marketSaturation, retailModeling):
+    secondsToProduce100units = time_to_sell_units(100, salesModifier, price, quality, marketSaturation, retailModeling)
+    return 100*3600/secondsToProduce100units
 
 def gen_stores():
     out_report = []
@@ -64,11 +78,11 @@ def gen_stores():
             kind = k.get("kind")
             if not kind in dict_ticker:
                 kinds_not_found.append(kind)
-            market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000)
+            market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000) # default is a dummy value to throw the result way off
             exchange_cost_to_fill_one_hour = k.get("units_sold_per_hour") * market_price_per_unit
-            exchange_cost_to_fill_one_day = k.get("units_sold_per_hour") * market_price_per_unit * 24
-            profit_per_hour[k['name']]["f"] = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
-            if True or not rc:
+            pph = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
+            profit_per_hour[k['name']]["f"] = pph
+            if not args.get("-r") or not rc:
                 continue
             json_res = rc.hget("simco:resources", f"{k['kind']}:json")
             if not json_res:
@@ -82,15 +96,24 @@ def gen_stores():
             # REDIS MODE
             retail_modeling = json_res.get("retailModeling")
             if not retail_modeling:
-                logging.debug(f"kind {k} has no retailModeling, may be aerospace item")
+                if args.get("-d"):
+                    logging.debug(f"kind {k} has no retailModeling, may be aerospace item")
                 continue
             average_retail_price = json_res.get("averageRetailPrice")
             market_saturation = json_res.get("marketSaturation")
             hash_formula = retail_modeling_parse(retail_modeling)
-            units_sold_per_hour = retail_modeling_calculate(hash_formula, average_retail_price, market_saturation, 1000)
-            logging.debug(f"[DEBUG: {k['name']}:{k['kind']} usph={round(units_sold_per_hour,2)} arp={round(average_retail_price,2)} sat={round(market_saturation,2)}]")
-            revenue_per_hour_redis = units_sold_per_hour * k.get("revenue_less_wages_per_unit")
-            profit_per_hour[k.get("name")]["redis"] = round(revenue_per_hour_redis - exchange_cost_to_fill_one_hour, 2)
+            quantity = 100
+            time_modeling = retail_modeling_calculate(hash_formula, average_retail_price, market_saturation, quantity)
+            sales_modifier_me = 3
+            quality = 0
+            redis_units_sold_per_hour = units_sold_an_hour(sales_modifier_me, average_retail_price, quality, market_saturation, time_modeling)
+            revenue_per_hour_redis = redis_units_sold_per_hour * k.get("revenue_less_wages_per_unit")
+            if args.get("-d"):
+                logging.debug(f"[DEBUG: {k['name']}:{k['kind']} rusph={round(redis_units_sold_per_hour,2)} tmodeling={round(time_modeling,2)} arp={round(average_retail_price,2)} sat={round(market_saturation,2)}]")
+            exchange_cost_to_fill_one_hour_redis = redis_units_sold_per_hour * market_price_per_unit
+            pph_redis = round(revenue_per_hour_redis - exchange_cost_to_fill_one_hour_redis, 2)
+            percent_diff = round(100*(pph/pph_redis), 2)
+            profit_per_hour[k.get("name")]["r"] = pph_redis 
         d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1]["f"], reverse=True))
         out_report.append(f"  [{s['name'].upper()}] {d_sorted}")
     if len(kinds_not_found) > 0:

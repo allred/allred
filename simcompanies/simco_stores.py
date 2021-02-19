@@ -201,7 +201,7 @@ stores = [
                     "name": "apples",
                     "kind": 3,
                     "units_sold_per_hour": 83.45,
-                    "revenue_less_wages_per_unit": 2.10,
+                    "revenue_less_wages_per_unit": 2.14,
                     },
                 {
                     "name": "oranges",
