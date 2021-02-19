@@ -17,6 +17,7 @@ import time
 from datetime import datetime
 from docopt import docopt
 from simco_base import *
+from util_status_resources import get_resource_statuses
 
 """
 const timeModeling = (retailModeling, saturation, amount, price) => eval(retailModeling);
@@ -118,6 +119,19 @@ def gen_stores():
         out_report.append(f"  [{s['name'].upper()}] {d_sorted}")
     if len(kinds_not_found) > 0:
         logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
+
+    try:
+        resource_statuses = get_resource_statuses()
+        newest_resource = ""
+        oldest_resource = ""
+        for k, v in sorted(resource_statuses.items(), key=lambda y: str(y[1]), reverse=True):
+            if not newest_resource:
+                newest_resource = f"{k} {str(datetime.fromtimestamp(v))}"
+            oldest_resource = f"{k} {str(datetime.fromtimestamp(v))}"
+        out_report.append(f"[newest] {newest_resource}")
+        out_report.append(f"[oldest] {oldest_resource}")
+    except Exception as e:
+        logging.warning(f"{e}")
     return out_report, dict_header
 
 def print_stores():
@@ -146,6 +160,8 @@ def print_stores_web():
     for line in list_stores:
         if header_printed:
             m = re_store.search(line)
+            if not m:
+                continue
             groupdict = m.groupdict()
             print(f'''
 <div class="row">
