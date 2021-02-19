@@ -9,6 +9,6 @@ r = request_resource_from_api(kind_random)
 if r.ok:
     n = redis_hset_resource(kind_random, r.json())
     print(r.json())
-    print(f"{kind_random} requests:{r} redis:{n}")
+    print(f"{kinds[kind_random]} requests:{r} redis:{n}")
 else:
     print(r)
