@@ -11,14 +11,22 @@ def write_to_influxdb(bucket):
     client = influxdb_client()
     write_api = client.write_api(write_options=SYNCHRONOUS)
     list_write_to_influx = []
+    logging.debug(f"INFLuXX here we go")
     for r in list_ticker:
-        influx_line = f'ticker,kind={r["kind"]} price={r["price"]}'
+        product_label = r["kind"]
+        if product_label in kinds:
+            kindnum = product_label
+            product_label = kinds[kindnum]
+        influx_line = f'ticker,kind={product_label} price={r["price"]}'
+        logging.debug(f"INFLuXX {influx_line}")
         list_write_to_influx.append(influx_line)
+    logging.debug(f"INFLuXX ready to write")
     res_write = write_api.write(bucket, org_influxdb, list_write_to_influx)
     return res_write
 
 if __name__ == '__main__':
-    r, uri_ticker = request_dict_ticker_from_simco_http() 
+    kinds = get_kinds_from_stores()
+    r, uri_ticker = request_dict_ticker_from_simco_http()
     #print(r.content.decode("utf-8"))
     list_ticker = r.json()
     dict_out = {
@@ -39,7 +47,7 @@ if __name__ == '__main__':
     try:
         res_red = push_to_redis()
     except Exception as e:
-        print(e)
+        logging.error(e)
     logging.debug(f"redis->{redis_list_ticker} push done: {res_red}")
 
     bucket_influxdb = "simco"
@@ -47,5 +55,5 @@ if __name__ == '__main__':
     try:
         res_inf = write_to_influxdb(bucket_influxdb)
     except Exception as e:
-        print(e)
-    logging.debug(f"influxdb write done: {res_inf}")
+        logging.error(f"exception; {e}")
+    logging.debug(f"influxdb write done")
