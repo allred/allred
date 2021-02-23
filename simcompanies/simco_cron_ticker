@@ -1,0 +1,9 @@
+#!/bin/bash
+if [ "$HOSTNAME" = "wyvern" ]; then
+    python="$HOME/gits/pyenv/versions/3.9.1/bin/python"
+else
+    python="$HOME/.pyenv/versions/3.9.1/bin/python"
+fi
+
+$HOME/gits/allred/simcompanies/simco_cron_fetch_ticker > $HOME/log/simco_cron_fetch_ticker.log 2>&1\
+&& $HOME/gits/allred/simcompanies/simco_cron_rsync_reports

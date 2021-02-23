@@ -79,6 +79,7 @@ def gen_stores():
             kind = k.get("kind")
             if not kind in dict_ticker:
                 kinds_not_found.append(kind)
+                continue
             market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000) # default is a dummy value to throw the result way off
             exchange_cost_to_fill_one_hour = k.get("units_sold_per_hour") * market_price_per_unit
             pph = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
@@ -115,7 +116,7 @@ def gen_stores():
             pph_redis = round(revenue_per_hour_redis - exchange_cost_to_fill_one_hour_redis, 2)
             percent_diff = round(100*(pph/pph_redis), 2)
             profit_per_hour[k.get("name")]["r"] = pph_redis 
-        d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1]["f"], reverse=True))
+        d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1]["r"], reverse=True))
         out_report.append(f"  [{s['name'].upper()}] {d_sorted}")
     if len(kinds_not_found) > 0:
         logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
@@ -125,18 +126,24 @@ def gen_stores():
         newest_resource = ""
         oldest_resource = ""
         for k, v in sorted(resource_statuses.items(), key=lambda y: str(y[1]), reverse=True):
+            tstamp_resource = datetime.fromtimestamp(v)
+            tstamp_now = datetime.now()
+            tdiff = tstamp_now - tstamp_resource
+            seconds_in_day = 24 * 60 * 60
             if not newest_resource:
-                newest_resource = f"{k} {str(datetime.fromtimestamp(v))}"
-            oldest_resource = f"{k} {str(datetime.fromtimestamp(v))}"
-        out_report.append(f"[newest] {newest_resource}")
-        out_report.append(f"[oldest] {oldest_resource}")
+                newest_resource = f"{k} {str(tstamp_resource)} {tdiff.seconds}"
+                newest_daysec = divmod(tdiff.days * seconds_in_day + tdiff.seconds, 60)
+            oldest_resource = f"{k} {str(tstamp_resource)} {tdiff.seconds}"
+            oldest_daysec = divmod(tdiff.days * seconds_in_day + tdiff.seconds, 60)
+        out_report.append(f"[newest] {newest_resource} min,sec={newest_daysec}")
+        out_report.append(f"[oldest] {oldest_resource} min,sec={oldest_daysec}")
     except Exception as e:
         logging.warning(f"{e}")
     return out_report, dict_header
 
 def print_stores():
-    out, dict_header = gen_stores()
-    for line in out:
+    list_out, dict_header = gen_stores()
+    for line in list_out:
         print(line)
 
 def print_stores_web():
@@ -152,7 +159,7 @@ def print_stores_web():
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   </head>
   <body>
-    <div class="container">
+    <div class="container black blue-text text-darken-2">
 """)
 
     header_printed = False
@@ -175,7 +182,7 @@ def print_stores_web():
 
     print(f"""
     <!--h2>{dict_header['t']}</h2-->
-    <h2><script>document.write("generated " + Math.floor(Math.floor(Date.now()/1000 - {time.time()}) / 60) + "m ago")</script></h2>
+    <h2><script>document.write("report generated " + Math.floor(Math.floor(Date.now()/1000 - {time.time()}) / 60) + "m ago")</script></h2>
 
     <!--
     <h2><a href="https://snapshot.raintank.io/dashboard/snapshot/bkvCQJyglvsj6scy3jz6x3BV867kFZn6">snapshot</a></h2>
