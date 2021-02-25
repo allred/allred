@@ -1,4 +1,6 @@
 #!/bin/bash
+set -eu -o pipefail
+#echo $((1+$RANDOM % 10))
 if [ "$HOSTNAME" = "wyvern" ]; then
     python="$HOME/gits/pyenv/versions/3.9.1/bin/python"
 else
