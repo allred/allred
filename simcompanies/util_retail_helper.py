@@ -116,7 +116,10 @@ def gen_stores():
             pph_redis = round(revenue_per_hour_redis - exchange_cost_to_fill_one_hour_redis, 2)
             percent_diff = round(100*(pph/pph_redis), 2)
             profit_per_hour[k.get("name")]["r"] = pph_redis 
-        d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1]["r"], reverse=True))
+        sort_key = "f"
+        if args.get("-r"):
+            sort_key = "r"
+        d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1][sort_key], reverse=True))
         out_report.append(f"  [{s['name'].upper()}] {d_sorted}")
     if len(kinds_not_found) > 0:
         logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
