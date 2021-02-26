@@ -17,6 +17,8 @@ def write_to_influxdb(bucket):
         if product_label in kinds:
             kindnum = product_label
             product_label = kinds[kindnum]
+        else:
+            continue
         influx_line = f'ticker,kind={product_label} price={r["price"]}'
         logging.debug(f"INFLuXX {influx_line}")
         list_write_to_influx.append(influx_line)
