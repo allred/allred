@@ -12,7 +12,8 @@ from datetime import datetime, timedelta
 from simco_stores import stores
 
 token_redis = os.environ["SIMCO_REDIS_TOKEN"]
-uri_redis = f"redis://{token_redis}@redis-10827.c8.us-east-1-4.ec2.cloud.redislabs.com:10827"
+hostport_redis = os.environ["SIMCO_REDIS_URI"]
+uri_redis = f"redis://:{token_redis}@{hostport_redis}"
 redis_list_ticker = "simco:ticker_json"
 redis_list_resource_apples = "simco:resource_apples_json"
 
