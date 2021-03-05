@@ -6,7 +6,8 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 token_influxdb = os.environ["SIMCO_INFLUXDB_TOKEN"]
 url_influxdb = "https://us-east-1-1.aws.cloud2.influxdata.com"
 org_influxdb = "mikejallred@gmail.com"
-bucket_influxdb = "mikejallred's Bucket"
+#bucket_influxdb = "mikejallred's Bucket"
+bucket_influxdb = "simco"
 
 def influxdb_client():
     client = InfluxDBClient(url=url_influxdb, token=token_influxdb)
