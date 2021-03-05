@@ -1,0 +1,2 @@
+#!/bin/bash
+mongo "$SIMCO_MONGODB_CONNECTION_STRING" --username $SIMCO_MONGODB_USER --password $SIMCO_MONGODB_PASS
