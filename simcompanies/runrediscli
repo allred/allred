@@ -1,0 +1,4 @@
+#!/bin/bash
+redis_url="redis://$SIMCO_REDIS_TOKEN@$SIMCO_REDIS_URI"
+export REDISCLI_AUTH=$SIMCO_REDIS_TOKEN
+redis-cli -u "$redis_url"
