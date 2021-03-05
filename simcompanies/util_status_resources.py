@@ -13,6 +13,8 @@ def get_resource_statuses():
     status = {}
     for i in resources_redis:
         num, label = i.decode().split(':')
+        if not k.get(int(num)):
+            continue
         if pattern.match(i.decode()):
             status[f"{k[int(num)]}:{num}"] = parser.parse(resources_redis[i].decode()).timestamp()
     return status
