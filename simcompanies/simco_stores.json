@@ -186,8 +186,8 @@
                 {
                     "name": "apples",
                     "kind": 3,
-                    "units_sold_per_hour": 83.45,
-                    "revenue_less_wages_per_unit": 2.1
+                    "units_sold_per_hour": 81.19,
+                    "revenue_less_wages_per_unit": 2.06
                     },
                 {
                     "name": "oranges",
