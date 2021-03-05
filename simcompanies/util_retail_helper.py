@@ -83,7 +83,8 @@ def gen_stores():
             market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000) # default is a dummy value to throw the result way off
             exchange_cost_to_fill_one_hour = k.get("units_sold_per_hour") * market_price_per_unit
             pph = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
-            profit_per_hour[k['name']]["f"] = pph
+            if not args.get("-r"):
+                profit_per_hour[k['name']]["f"] = pph
             if not args.get("-r") or not rc:
                 continue
             json_res = rc.hget("simco:resources", f"{k['kind']}:json")
@@ -119,7 +120,11 @@ def gen_stores():
         sort_key = "f"
         if args.get("-r"):
             sort_key = "r"
-        d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1][sort_key], reverse=True))
+            items2 = {k:v[sort_key] for k,v in sorted(profit_per_hour.items())}
+            items2 = dict(sorted(items2.items(), key=lambda x: x[1], reverse=True))
+            d_sorted = items2
+        else:
+            d_sorted = dict(sorted(profit_per_hour.items(), key=lambda x: x[1][sort_key], reverse=True))
         out_report.append(f"  [{s['name'].upper()}] {d_sorted}")
     if len(kinds_not_found) > 0:
         logging.warning(f"WARNING: {len(kinds_not_found)} not in ticker")
@@ -175,8 +180,8 @@ def print_stores_web():
             groupdict = m.groupdict()
             print(f'''
 <div class="row">
-  <div class="col s2">{groupdict["label"]}</div>
-  <div class="col s10">{groupdict["wares"]}</div>
+  <div class="col s2"><h6>{groupdict["label"]}</h6></div>
+  <div class="col s10"><h3>{groupdict["wares"]}</h3></div>
 </div>''')
         else:
             print(f'<div class="row"><div class="col s12">{line}</div></div>')
