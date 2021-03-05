@@ -63,13 +63,13 @@
                 {
                     "name": "tablets",
                     "kind": 25,
-                    "units_sold_per_hour": .49,
+                    "units_sold_per_hour": 0.49,
                     "revenue_less_wages_per_unit": 798.48
                     },
                 {
                     "name": "laptops",
                     "kind": 26,
-                    "units_sold_per_hour": .60,
+                    "units_sold_per_hour": 0.60,
                     "revenue_less_wages_per_unit": 1176.75
                     },
                 {
@@ -87,7 +87,7 @@
                 {
                     "name": "quadcopter",
                     "kind": 98,
-                    "units_sold_per_hour": .63,
+                    "units_sold_per_hour": 0.63,
                     "revenue_less_wages_per_unit": 892.78
                     }
                 ]
