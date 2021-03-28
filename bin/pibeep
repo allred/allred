@@ -1,0 +1,6 @@
+#!/bin/bash
+#telegraf --test
+tstamp="$(date +%s)"
+cmd="SET pibeep:$(hostname) $tstamp"
+echo $cmd
+echo "$cmd" | redis-cli -u "redis://$SIMCO_REDIS_TOKEN@$SIMCO_REDIS_URI" 
