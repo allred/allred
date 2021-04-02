@@ -41,13 +41,13 @@
                     "name": "petrol",
                     "kind": 11,
                     "units_sold_per_hour": 81.69,
-                    "revenue_less_wages_per_unit": 40.97
+                    "revenue_less_wages_per_unit": 42.34
                     },
                 {
                     "name": "diesel",
                     "kind": 12,
                     "units_sold_per_hour": 82.36,
-                    "revenue_less_wages_per_unit": 40.60
+                    "revenue_less_wages_per_unit": 42.08
                     }
                 ]
             },

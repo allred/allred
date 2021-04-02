@@ -18,6 +18,11 @@ from datetime import datetime
 from docopt import docopt
 from simco_base import *
 from util_status_resources import get_resource_statuses
+from yaml import load, dump
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
 
 """
 const timeModeling = (retailModeling, saturation, amount, price) => eval(retailModeling);
@@ -41,8 +46,34 @@ const unitsSoldAnHour = (salesModifier, price, quality, marketSaturation, retail
 
 };
 
+const profitPerUnit = (
+  salesModifier,
+  price,
+  quality,
+  marketSaturation,
+  retailModeling,
+  administrationOverhead,
+  storeBaseSalary
+) => {
+  return price - (storeBaseSalary * administrationOverhead)/unitsSoldAnHour(salesModifier, price, quality, marketSaturation, retailModeling);
+};
+
 
 """
+
+def get_config():
+    stream = open("simco_config.yml", "r")
+    y = load(stream, Loader=Loader)
+    return y
+
+def get_administration_overhead(config):
+    ao = config.get("me").get("administrationOverhead")
+    return ao
+
+def profit_per_unit(salesModifier, price, quality, marketSaturation, retailModeling, administrationOverhead, storeBaseSalary):
+    usph = units_sold_an_hour(salesModifier, price, quality, marketSaturation, retailModeling)
+    profit = price - (storeBaseSalary * administrationOverhead) / usph
+    return profit
 
 # salesModifier comes from authUser (me.json ie, 3 for me, ie +3%)
 def time_to_sell_units(quantity, salesModifier, price, quality, marketSaturation, retailModeling):
@@ -61,6 +92,7 @@ def gen_stores():
     simco = Simco()
     #simco.silog('silog loggarooba')
     dict_ticker, datetime_simco_latest = get_dict_ticker_from_log()
+    administrationOverhead = get_administration_overhead(config)
     dict_header = {
         "t": datetime_simco_latest,
         "blurb": "[profit per hour, exchange -> retail]",
@@ -80,6 +112,11 @@ def gen_stores():
             if not kind in dict_ticker:
                 kinds_not_found.append(kind)
                 continue
+            # removeSTART
+            if kind == 11:
+                ppu_11_file = k.get("revenue_less_wages_per_unit")
+                ppu_11_redis = "???"
+            # removeEND
             market_price_per_unit = dict_ticker.get(k.get('kind'), 1000000) # default is a dummy value to throw the result way off
             exchange_cost_to_fill_one_hour = k.get("units_sold_per_hour") * market_price_per_unit
             pph = round(revenue_per_hour - exchange_cost_to_fill_one_hour, 2)
@@ -111,12 +148,14 @@ def gen_stores():
             quality = 0
             redis_units_sold_per_hour = units_sold_an_hour(sales_modifier_me, average_retail_price, quality, market_saturation, time_modeling)
             revenue_per_hour_redis = redis_units_sold_per_hour * k.get("revenue_less_wages_per_unit")
+            if kind == 11:
+                ppu_11_redis = profit_per_unit(sales_modifier_me, average_retail_price, quality, market_saturation, time_modeling, administrationOverhead, json_res.get("storeBaseSalary"))
             if args.get("-d"):
                 logging.debug(f"[DEBUG: {k['name']}:{k['kind']} rusph={round(redis_units_sold_per_hour,2)} tmodeling={round(time_modeling,2)} arp={round(average_retail_price,2)} sat={round(market_saturation,2)}]")
             exchange_cost_to_fill_one_hour_redis = redis_units_sold_per_hour * market_price_per_unit
             pph_redis = round(revenue_per_hour_redis - exchange_cost_to_fill_one_hour_redis, 2)
             percent_diff = round(100*(pph/pph_redis), 2)
-            profit_per_hour[k.get("name")]["r"] = pph_redis 
+            profit_per_hour[k.get("name")]["r"] = pph_redis
         sort_key = "f"
         if args.get("-r"):
             sort_key = "r"
@@ -145,6 +184,7 @@ def gen_stores():
             oldest_daysec = divmod(tdiff.days * seconds_in_day + tdiff.seconds, 60)
         out_report.append(f"[newest] {newest_resource} min,sec={newest_daysec}")
         out_report.append(f"[oldest] {oldest_resource} min,sec={oldest_daysec}")
+        out_report.append(f"[debug] petrol file:{ppu_11_file} redis:{ppu_11_redis}")
     except Exception as e:
         logging.warning(f"{e}")
     return out_report, dict_header
@@ -180,7 +220,7 @@ def print_stores_web():
             groupdict = m.groupdict()
             print(f'''
 <div class="row">
-  <div class="col s2"><h6>{groupdict["label"]}</h6></div>
+  <div class="col s2"><h7>{groupdict["label"]}</h7></div>
   <div class="col s10"><h3>{groupdict["wares"]}</h3></div>
 </div>''')
         else:
@@ -190,7 +230,14 @@ def print_stores_web():
 
     print(f"""
     <!--h2>{dict_header['t']}</h2-->
-    <h2><script>document.write("report generated " + Math.floor(Math.floor(Date.now()/1000 - {time.time()}) / 60) + "m ago")</script></h2>
+    <div class="row">
+      <div class="col s2"></div>
+      <div class="col s10"><h2><script>document.write("report generated " + Math.floor(Math.floor(Date.now()/1000 - {time.time()}) / 60) + "m ago")</script></h2></div>
+    </div>
+    <div class="row">
+      <div class="col s2"></div>
+      <div class="col s10"><h3><a href="simco_retail.txt">TXT VERSION</a></h3></div>
+    </div>
 
     <!--
     <h2><a href="https://snapshot.raintank.io/dashboard/snapshot/bkvCQJyglvsj6scy3jz6x3BV867kFZn6">snapshot</a></h2>
@@ -208,6 +255,7 @@ def print_stores_web():
 
 if __name__ == '__main__':
     args = docopt(usage, version='665')
+    config = get_config()
     if args.get("-w"):
         print_stores_web()
     else:

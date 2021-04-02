@@ -1,0 +1,5 @@
+---
+me:
+    # log in to simcompanies and follow this link to get the value
+    # https://www.simcompanies.com/api/v2/players/me/administration-overhead/
+    administrationOverhead: 1.3176470588235294
