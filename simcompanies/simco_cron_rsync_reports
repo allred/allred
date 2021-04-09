@@ -12,8 +12,8 @@ $python $base_simco/util_retail_helper.py -r -w | tee $file_tmp_retail
 $python $base_simco/util_retail_helper.py -dr 2>&1 | tee $file_tmp_retail_txt
 
 if [ "$HOSTNAME" = "wyvern" ]; then
-    rsync --timeout 60 -arvz -e "ssh -o StrictHostKeyChecking=no" -i $SIMCO_PATH_PEM $file_tmp_retail ubuntu@mikeallred.com:/var/www/presence/public
-    rsync --timeout 60 -arvz -e "ssh -o StrictHostKeyChecking=no" -i $SIMCO_PATH_PEM $file_tmp_retail_txt ubuntu@mikeallred.com:/var/www/presence/public
+    rsync --timeout 60 -arvz -e "ssh -o StrictHostKeyChecking=no" -i $SIMCO_PATH_PEM $file_tmp_retail $SIMCO_USER_SSH@$SIMCO_HOST_SSH:/var/www/presence/public
+    rsync --timeout 60 -arvz -e "ssh -o StrictHostKeyChecking=no" -i $SIMCO_PATH_PEM $file_tmp_retail_txt $SIMCO_USER_SSH@$SIMCO_HOST_SSH:/var/www/presence/public
 else
     cp -v $file_tmp_retail /var/www/presence/public
     cp -v $file_tmp_retail_txt /var/www/presence/public
