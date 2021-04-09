@@ -1,0 +1,38 @@
+#!/bin/bash
+#env
+set -eu -o pipefail
+#echo $((1+$RANDOM % 10))
+if [ "$HOSTNAME" = "wyvern" ]; then
+    #python="$HOME/gits/pyenv/versions/3.9.1/bin/python"
+    python="$HOME/.pyenv/versions/3.9.1/bin/python"
+else
+    python="$HOME/.pyenv/versions/3.9.1/bin/python"
+fi
+#seconds_old_for_alert=${1:-1200}
+seconds_old_for_alert=900
+
+cli="/usr/local/bin/redis-cli"
+date_local="$(date +%s)"
+echo "local: $date_local"
+date_remote="$(echo 'get pibeep:rp2-piloto-1' | $cli -u redis://$ALLRED_REDIS_TOKEN@$ALLRED_REDIS_URI --no-auth-warning | tail -1)"
+echo "remote: $date_remote"
+#seconds_diff=$(expr $date_local - $date_remote)
+seconds_diff=`expr $date_local - $date_remote`
+echo diff: $seconds_diff
+
+date
+echo ~
+if (( $seconds_diff > $seconds_old_for_alert )); then
+#if [[ "$seconds_diff" -gt "$seconds_old_for_alert" ]]; then
+    $python $HOME/gits/ouimeaux/client.py --scan --subnet 192.168.1.0/24
+    $python $HOME/gits/ouimeaux/client.py --device 192.168.1.21 --off
+    $python $HOME/gits/ouimeaux/client.py --device 192.168.1.21 --on
+    echo "LATE"
+    $python -c "print('👹' * 40)"
+else
+    echo "OK"
+    char='👾'
+    # in terminal, Edit -> Emojis
+    $python -c "print('🌲' * 40)"
+fi
+
