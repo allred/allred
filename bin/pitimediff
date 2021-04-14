@@ -20,19 +20,17 @@ echo "remote: $date_remote"
 seconds_diff=`expr $date_local - $date_remote`
 echo diff: $seconds_diff
 
-date
-echo ~
 if (( $seconds_diff > $seconds_old_for_alert )); then
 #if [[ "$seconds_diff" -gt "$seconds_old_for_alert" ]]; then
     $python $HOME/gits/ouimeaux/client.py --scan --subnet 192.168.1.0/24
     $python $HOME/gits/ouimeaux/client.py --device 192.168.1.21 --off
     $python $HOME/gits/ouimeaux/client.py --device 192.168.1.21 --on
+    date
     echo "LATE"
-    $python -c "print('👹' * 40)"
+    $python -c "print('LATE ' + '👹' * 36)"
 else
-    echo "OK"
     char='👾'
     # in terminal, Edit -> Emojis
-    $python -c "print('🌲' * 40)"
+    $python -c "print('OK ' + '🌲' * 38)"
 fi
 
