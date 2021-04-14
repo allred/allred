@@ -5,4 +5,5 @@ else
     python="$HOME/.pyenv/versions/3.9.1/bin/python"
 fi
 
-rsync --timeout 60 -arvz -e "ssh -o StrictHostKeyChecking=no" -i $SIMCO_PATH_PEM $HOME/Downloads/sim-companies-account-history* $SIMCO_USER_SSH@$SIMCO_HOST_SSH:/Downloads
+#/usr/local/bin/rsync --timeout 60 -arvz -e "ssh -o StrictHostKeyChecking=no -i $SIMCO_PATH_PEM" $HOME/Downloads/*.csv $SIMCO_USER_SSH@$SIMCO_HOST_SSH:Downloads/
+/usr/local/bin/rsync --timeout 60 -arvz -e "ssh -o StrictHostKeyChecking=no -i $SIMCO_PATH_PEM" $HOME/Downloads/sim-companies-account-history*csv $SIMCO_USER_SSH@$SIMCO_HOST_SSH:Downloads/
