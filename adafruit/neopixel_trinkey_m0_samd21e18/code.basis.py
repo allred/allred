@@ -1,16 +1,17 @@
 """CircuitPython Essentials NeoPixel example"""
-import board
-import digitalio
-import neopixel
-import random
 import time
+import board
+import neopixel
+from digitalio import DigitalInOut, Direction, Pull
 
+#pixel_pin = board.A1
 print({"dbg": dir(board)})
 pixel_pin = board.NEOPIXEL
 num_pixels = 4
 brightness = 0.01 # was 0.3
 
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=brightness, auto_write=False)
+
 
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
@@ -42,16 +43,7 @@ def rainbow_cycle(wait):
         pixels.show()
         time.sleep(wait)
 
-def randpix_randcolor(wait):
-    pixel = random.randint(0, num_pixels - 1)
-    color = random.randint(0, 256)
-    #print({"p": pixel, "c": color})
-    pixels[pixel] = wheel(color)
-    pixels.show()
-    time.sleep(wait)
 
-
-OFF = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 150, 0)
 GREEN = (0, 255, 0)
@@ -80,6 +72,4 @@ while True:
     color_chase(PURPLE, 0.1)
     """
 
-    #color_chase(OFF, 0.1)
-    randpix_randcolor(0.1)
-    #rainbow_cycle(0)  # Increase the number to slow down the rainbow
+    rainbow_cycle(0)  # Increase the number to slow down the rainbow

@@ -1,0 +1,9 @@
+#!/bin/bash
+path_output="/Volumes/CIRCUITPY"
+
+if [[ ! -d "$path_output" || ! -w "$path_output" ]]; then
+    echo "path does not exist or is not writeable: $path_output"
+    exit 1
+fi
+
+cp -pv code.py "$path_output"
