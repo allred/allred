@@ -6,4 +6,5 @@ if [[ ! -d "$path_output" || ! -w "$path_output" ]]; then
     exit 1
 fi
 
+cp -pv npconfig.py "$path_output"
 cp -pv code.py "$path_output"

@@ -5,12 +5,16 @@ import neopixel
 import random
 import time
 
-print({"dbg": dir(board)})
-pixel_pin = board.NEOPIXEL
-num_pixels = 4
-brightness = 0.01 # was 0.3
-
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=brightness, auto_write=False)
+def read_config(file_config="./npconfig.py"):
+    try:
+        exec(open(file_config).read())
+    except Exception as e:
+        print(e)
+    print({
+        "board": dir(board),
+        "config": file_config,
+    })
+    #print(open(file_config).read())
 
 def wheel(pos):
     # Input a value 0 to 255 to get a color value.
@@ -42,7 +46,7 @@ def rainbow_cycle(wait):
         pixels.show()
         time.sleep(wait)
 
-def randpix_randcolor(wait):
+def randpixel_randcolor(wait):
     pixel = random.randint(0, num_pixels - 1)
     color = random.randint(0, 256)
     #print({"p": pixel, "c": color})
@@ -50,6 +54,14 @@ def randpix_randcolor(wait):
     pixels.show()
     time.sleep(wait)
 
+def purple_strobe(wait):
+    pixels.fill(OFF)
+    pixels.show()
+    pixels.fill(PURPLE)
+    pixels.show()
+    pixels.fill(OFF)
+    pixels.show()
+    time.sleep(wait)
 
 OFF = (0, 0, 0)
 RED = (255, 0, 0)
@@ -59,27 +71,30 @@ CYAN = (0, 255, 255)
 BLUE = (0, 0, 255)
 PURPLE = (180, 0, 255)
 
-while True:
-    """
-    pixels.fill(RED)
-    pixels.show()
-    # Increase or decrease to change the speed of the solid color change.
-    time.sleep(1)
-    pixels.fill(GREEN)
-    pixels.show()
-    time.sleep(1)
-    pixels.fill(BLUE)
-    pixels.show()
-    time.sleep(1)
+def main():
+    while True:
+        #purple_strobe(0.1)
+        randpixel_randcolor(2.0)
+        #rainbow_cycle(0)  # Increase the number to slow down the rainbow
 
-    color_chase(RED, 0.1)  # Increase the number to slow down the color chase
-    color_chase(YELLOW, 0.1)
-    color_chase(GREEN, 0.1)
-    color_chase(CYAN, 0.1)
-    color_chase(BLUE, 0.1)
-    color_chase(PURPLE, 0.1)
-    """
+def intro():
+    color_chase(PURPLE, 0.1)  # Increase the number to slow down the color chase
+    color_chase(OFF, 0.1)
+    pixels.fill(CYAN)
+    pixels.show()
+    pixels.fill(PURPLE)
+    pixels.show()
+    pixels.fill(CYAN)
+    pixels.show()
+    color_chase(OFF, 0.1)
 
-    #color_chase(OFF, 0.1)
-    randpix_randcolor(0.1)
-    #rainbow_cycle(0)  # Increase the number to slow down the rainbow
+if __name__ == '__main__':
+    read_config()
+    pixel_pin = board.NEOPIXEL
+    num_pixels = num_pixels or 4
+    brightness = brightness or 0.3
+
+    pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=brightness, auto_write=False)
+
+    intro()
+    main()
