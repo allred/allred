@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo apt install build-essential curl file git gpsd procps redis ruby
