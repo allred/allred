@@ -8,10 +8,10 @@ ALLRED_CMD = "./cmd"
 
 
 build:
-	go build -v -o $(ALLRED_BIN) $(ALLRED_CMD)/util_status_resource
+	go build -v -o $(ALLRED_BIN) $(ALLRED_CMD)/glorphus
 
 run:
-	./bin/util_status_resource
+	./bin/glorphus
 
 test:
 	go test

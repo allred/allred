@@ -47,6 +47,7 @@ def rainbow_cycle(wait):
         time.sleep(wait)
 
 def randpixel_randcolor(wait):
+    """ best at brightness=.01 """
     pixel = random.randint(0, num_pixels - 1)
     color = random.randint(0, 256)
     #print({"p": pixel, "c": color})
@@ -78,14 +79,8 @@ def main():
         #rainbow_cycle(0)  # Increase the number to slow down the rainbow
 
 def intro():
-    color_chase(PURPLE, 0.1)  # Increase the number to slow down the color chase
     color_chase(OFF, 0.1)
-    pixels.fill(CYAN)
-    pixels.show()
-    pixels.fill(PURPLE)
-    pixels.show()
-    pixels.fill(CYAN)
-    pixels.show()
+    color_chase(PURPLE, 0.1)  # Increase the number to slow down the color chase
     color_chase(OFF, 0.1)
 
 if __name__ == '__main__':
