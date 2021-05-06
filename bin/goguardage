@@ -1,28 +1,49 @@
 #!/usr/bin/env ruby
+# docopt for ruby sucks as of 2021-05-06
 require 'listen'
 require 'lolcat'
+require 'optparse'
 
-require 'listen'
+usage = <<"USAGE"
+Usage: #{File.basename(__FILE__)} [-c command] [-w watchdir]
+USAGE
+
 dir_base = "#{ENV['HOME']}/gits/allred"
-dir_listen = "#{dir_base}/cmd"
-opts_lolcat = {
+options = {}
+options[:command] = "make -C #{dir_base} && make -C #{dir_base} run"
+options[:watchdir] = ENV['PWD']
+OptionParser.new do |opts|
+  opts.banner = usage
+  opts.on("-c", "--command COMMAND") do |o|
+    options[:command] = o
+  end
+  opts.on("-h", "--help") do |o|
+    puts(opts.banner)
+    exit(false)
+  end
+  opts.on("-w", "--watchdir WATCHDIR") do |o|
+    options[:watchdir] = o
+  end
+end.parse!
+
+$opts_lolcat = {
   :freq => 0.1,
   :os => rand(256),
   :spread => 3.0,
 }
 
-#Lol.println("#{`figlet -f doom 'goguard'`}", {}, opts_lolcat)
-Lol.println("#{`figlet '#{File.basename(__FILE__)}'`}", {}, opts_lolcat)
-Lol.println("listening to: #{dir_listen}\n", {}, opts_lolcat)
-listener = Listen.to("#{dir_listen}") do |modified, added, removed|
-  puts(modified: modified, added: added, removed: removed)
-  system("make -C #{dir_base} && make -C #{dir_base} run")
-  Lol.println("#{File.basename(__FILE__)} finished at #{Time.now}\n", {}, opts_lolcat)
+def glog(str)
+  Lol.println("#{File.basename(__FILE__)} #{str}\n", {}, $opts_lolcat)
+end
+
+Lol.println("#{`figlet '#{File.basename(__FILE__)}'`}", {}, $opts_lolcat)
+glog(usage)
+glog("watching: #{options[:watchdir]}")
+glog("command: #{options[:command]}")
+listener = Listen.to(options[:watchdir]) do |modified, added, removed|
+  dbg = {t: Time.now, modified: modified, added: added, removed: removed}
+  glog("#{dbg}")
+  system(options[:command])
 end
 listener.start
 sleep
-
-#export THOR_SILENCE_DEPRECATION=1
-#bundle exec guard
-#guard --no-bundler-warning -g default
-#guard --debug --group="development" --guardfile=$HOME/gits/allred/Guardfile --watchdir=$HOME/gits/allred/cmd

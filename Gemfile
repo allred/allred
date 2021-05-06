@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-#gem 'guard'
-#gem 'guard-go'
+#gem 'docopt' sucks
 gem 'listen'
 gem 'lolcat'
