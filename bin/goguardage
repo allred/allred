@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+require 'listen'
+require 'lolcat'
+
+require 'listen'
+dir_base = "#{ENV['HOME']}/gits/allred"
+dir_listen = "#{dir_base}/cmd"
+opts_lolcat = {
+  :freq => 0.1,
+  :os => rand(256),
+  :spread => 3.0,
+}
+
+#Lol.println("#{`figlet -f doom 'goguard'`}", {}, opts_lolcat)
+Lol.println("#{`figlet '#{File.basename(__FILE__)}'`}", {}, opts_lolcat)
+Lol.println("listening to: #{dir_listen}\n", {}, opts_lolcat)
+listener = Listen.to("#{dir_listen}") do |modified, added, removed|
+  puts(modified: modified, added: added, removed: removed)
+  system("make -C #{dir_base} && make -C #{dir_base} run")
+  Lol.println("#{File.basename(__FILE__)} finished at #{Time.now}\n", {}, opts_lolcat)
+end
+listener.start
+sleep
+
+#export THOR_SILENCE_DEPRECATION=1
+#bundle exec guard
+#guard --no-bundler-warning -g default
+#guard --debug --group="development" --guardfile=$HOME/gits/allred/Guardfile --watchdir=$HOME/gits/allred/cmd

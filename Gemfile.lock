@@ -1,95 +1,27 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.6.0)
-      public_suffix (>= 2.0.2, < 4.0)
-    aws-eventstream (1.0.3)
-    aws-sdk (2.11.314)
-      aws-sdk-resources (= 2.11.314)
-    aws-sdk-core (2.11.314)
-      aws-sigv4 (~> 1.0)
-      jmespath (~> 1.0)
-    aws-sdk-resources (2.11.314)
-      aws-sdk-core (= 2.11.314)
-    aws-sigv4 (1.1.0)
-      aws-eventstream (~> 1.0, >= 1.0.2)
-    buftok (0.2.0)
-    concurrent-ruby (1.1.5)
-    domain_name (0.5.20190701)
-      unf (>= 0.0.5, < 1.0.0)
-    equalizer (0.0.11)
-    faker (1.9.6)
-      i18n (>= 0.7)
-    faraday (0.11.0)
-      multipart-post (>= 1.2, < 3)
-    http (2.2.2)
-      addressable (~> 2.3)
-      http-cookie (~> 1.0)
-      http-form_data (~> 1.0.1)
-      http_parser.rb (~> 0.6.0)
-    http-cookie (1.0.3)
-      domain_name (~> 0.5)
-    http-form_data (1.0.3)
-    http_parser.rb (0.6.0)
-    i18n (1.6.0)
-      concurrent-ruby (~> 1.0)
-    ipaddress (0.8.3)
-    jmespath (1.4.0)
-    memoizable (0.4.2)
-      thread_safe (~> 0.3, >= 0.3.1)
-    moji (1.6)
-    mojinizer (0.2.2)
-      moji (~> 1.6)
-    multipart-post (2.1.1)
-    mustermann (1.0.3)
-    naught (1.1.0)
-    oj (3.7.12)
-    public_suffix (3.1.1)
-    rack (2.0.7)
-    rack-protection (2.0.5)
-      rack
-    redd (0.8.8)
-      http (~> 2.2)
-    simple_oauth (0.3.1)
-    sinatra (2.0.5)
-      mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.5)
-      tilt (~> 2.0)
-    term-ansicolor (1.7.1)
-      tins (~> 1.0)
-    thor (0.20.3)
-    thread_safe (0.3.6)
-    tilt (2.0.9)
-    tins (1.21.0)
-    twitter (6.1.0)
-      addressable (~> 2.5)
-      buftok (~> 0.2.0)
-      equalizer (= 0.0.11)
-      faraday (~> 0.11.0)
-      http (~> 2.1)
-      http_parser.rb (~> 0.6.0)
-      memoizable (~> 0.4.2)
-      naught (~> 1.1)
-      simple_oauth (~> 0.3.1)
-    unf (0.1.4)
-      unf_ext
-    unf_ext (0.0.7.6)
+    ffi (1.15.0)
+    listen (3.5.1)
+      rb-fsevent (~> 0.10, >= 0.10.3)
+      rb-inotify (~> 0.9, >= 0.9.10)
+    lolcat (100.0.1)
+      manpages (~> 0.6.1)
+      optimist (~> 3.0.0)
+      paint (~> 2.1)
+    manpages (0.6.1)
+    optimist (3.0.1)
+    paint (2.2.1)
+    rb-fsevent (0.10.4)
+    rb-inotify (0.10.1)
+      ffi (~> 1.0)
 
 PLATFORMS
-  ruby
+  x86_64-darwin-20
 
 DEPENDENCIES
-  aws-sdk (~> 2)
-  faker
-  ipaddress
-  mojinizer
-  oj
-  redd (~> 0.7)
-  sinatra
-  term-ansicolor
-  thor
-  twitter (~> 6.1.0)
+  listen
+  lolcat
 
 BUNDLED WITH
-   1.17.2
+   2.2.17
