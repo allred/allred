@@ -1,0 +1,8 @@
+#!/bin/bash
+# wget adafruit-circuitpython-neopixel_trinkey_m0-en_US-6.2.0.uf2
+cp $HOME/Downloads/adafruit-circuitpython-neopixel_trinkey_m0-en_US-6.2.0.uf2 /Volumes/TRINKEYBOOT/
+# wget adafruit-circuitpython-bundle-6.x-mpy-20210426.zip
+# unzip adafruit-circuitpython-bundle-6.x-mpy-20210426.zip
+cd $HOME/Downloads/adafruit-circuitpython-bundle-6.x-mpy-20210426
+cp lib/neopixel.mpy /Volumes/CIRCUITPY/lib
+./deploy

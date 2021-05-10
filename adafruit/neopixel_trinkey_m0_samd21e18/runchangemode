@@ -1,0 +1,12 @@
+#!/bin/bash
+# default runmode is 'default'
+tmpfile="/var/tmp/npconfig.py"
+grep -v "runmode" ./npconfig.py > $tmpfile 
+echo "arg: $1"
+if [ -z "$1" ]; then
+  echo "runmode = 'default'" >> $tmpfile
+else
+  echo "runmode = '$1'" >> $tmpfile
+fi
+    
+cp -v $tmpfile ./ 

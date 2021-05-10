@@ -4,7 +4,6 @@ import digitalio
 import neopixel
 import random
 import time
-import touchio
 
 def read_config(file_config="./npconfig.py"):
     try:
@@ -73,68 +72,11 @@ CYAN = (0, 255, 255)
 BLUE = (0, 0, 255)
 PURPLE = (180, 0, 255)
 
-def quack(wait):
-    print("hullo i'm quack")
-    pixels.fill(GREEN)
-    pixels.show()
-    pixels.fill(BLUE)
-    pixels.show()
-    time.sleep(wait)
-
-def blueblip(wait):
-    pixel = random.randint(0, num_pixels - 1)
-    pixels[pixel] = GREEN
-    pixels.show()
-    pixels.fill(BLUE)
-    pixels.show()
-    time.sleep(wait)
-
-def colorblip(wait, color):
-    brightness_mod = 0.05
-    pixels.brightness += brightness_mod 
-    pixels.show()
-    pixels.brightness -= brightness_mod 
-    pixels.show()
-    pixels.fill(color)
-    pixels.show()
-
-def redblip(wait):
-    colorblip(wait, RED)
-    time.sleep(wait)
-
-def greenblip(wait):
-    colorblip(wait, GREEN)
-    time.sleep(wait)
-
-
 def main():
-    time_touched = time.monotonic()
     while True:
         #purple_strobe(0.1)
+        randpixel_randcolor(2.0)
         #rainbow_cycle(0)  # Increase the number to slow down the rainbow
-        #modimporty()
-        if runmode == "default":
-            #intro()
-            randpixel_randcolor(2.0)
-        if runmode == "blueblip":
-            blueblip(5.0)
-        if runmode == "redblip":
-            redblip(2.0)
-        if runmode == "quack":
-            quack(2.0)
-        if time.monotonic() - time_touched < 0.15:
-            continue
-        if touch1.value:
-            pixels.brightness += 0.05
-            pixels.show()
-            time_touched = time.monotonic()
-            print("{}".format({"t": time.monotonic(), "touch1": touch2}))
-        elif touch2.value:
-            pixels.brightness -= 0.05
-            pixels.show()
-            time_touched = time.monotonic()
-            print("{}".format({"t": time.monotonic(), "touch2": touch2}))
-        print("{}".format({"t": time.monotonic(), "brightness": pixels.brightness, "runmode": runmode}))
 
 def intro():
     color_chase(OFF, 0.1)
@@ -149,8 +91,5 @@ if __name__ == '__main__':
 
     pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=brightness, auto_write=False)
 
-    touch1 = touchio.TouchIn(board.TOUCH1)
-    touch2 = touchio.TouchIn(board.TOUCH2)
-
+    intro()
     main()
-
