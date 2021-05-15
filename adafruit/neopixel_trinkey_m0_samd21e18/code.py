@@ -65,6 +65,7 @@ def purple_strobe(wait):
     pixels.show()
     time.sleep(wait)
 
+
 OFF = (0, 0, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 150, 0)
@@ -82,11 +83,15 @@ def quack(wait):
     time.sleep(wait)
 
 def blueblip(wait):
-    pixel = random.randint(0, num_pixels - 1)
-    pixels[pixel] = GREEN
-    pixels.show()
-    pixels.fill(BLUE)
-    pixels.show()
+    itery = random.randint(0, num_pixels)
+    #for i in range(itery):
+    for i in range(20):
+        pixel = random.randint(0, num_pixels - 1)
+        pixels[pixel] = GREEN
+        pixels.show()
+        #pixels.fill(BLUE)
+        pixels.fill(PURPLE)
+        pixels.show()
     time.sleep(wait)
 
 def colorblip(wait, color):
@@ -106,6 +111,15 @@ def greenblip(wait):
     colorblip(wait, GREEN)
     time.sleep(wait)
 
+def color_stroll(wait=1):
+    pixel = random.randint(0, num_pixels - 1)
+    color = random.randint(0, 256)
+    #print({"p": pixel, "c": color})
+    pixels[pixel] = wheel(color)
+    pixels.show()
+    print("color_stroll: blah")
+    time.sleep(wait)
+
 
 def main():
     time_touched = time.monotonic()
@@ -122,6 +136,8 @@ def main():
             redblip(2.0)
         if runmode == "quack":
             quack(2.0)
+        if runmode == "color_stroll":
+            color_stroll(2.0)
         if time.monotonic() - time_touched < 0.15:
             continue
         if touch1.value:
@@ -134,7 +150,7 @@ def main():
             pixels.show()
             time_touched = time.monotonic()
             print("{}".format({"t": time.monotonic(), "touch2": touch2}))
-        print("{}".format({"t": time.monotonic(), "brightness": pixels.brightness, "runmode": runmode}))
+        #print("{}".format({"t": time.monotonic(), "brightness": pixels.brightness, "runmode": runmode}))
 
 def intro():
     color_chase(OFF, 0.1)

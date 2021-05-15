@@ -2,4 +2,4 @@
 # defalt mode is 'default'
 brightness = .01
 num_pixels = 4
-runmode = 'blueblip'
+runmode = 'color_stroll'
