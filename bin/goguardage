@@ -46,7 +46,7 @@ glog("command: #{options[:command]}")
 glog("ignoring: #{options[:ignore]}")
 listener = Listen.to(options[:watchdir]) do |modified, added, removed|
   dbg = {t: Time.now, modified: modified, added: added, removed: removed}
-  if options[:ignore] && (modified[0] =~ /^.*#{options[:ignore]}$/ || added[0] =~ /^.*#{options[:ignore]}$/ || removed[0] =~ /^.*#{options[:ignore]}$/)
+  if options[:ignore] && (modified.any?(/^.*#{options[:ignore]}$/) || added.any?(/^.*#{options[:ignore]}$/) || removed.any?(/^.*#{options[:ignore]}$/))
     glog("IGNORING #{modified}")
     next
   end
