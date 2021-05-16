@@ -113,11 +113,40 @@ def greenblip(wait):
 
 def color_stroll(wait=1):
     pixel = random.randint(0, num_pixels - 1)
-    color = random.randint(0, 256)
-    #print({"p": pixel, "c": color})
-    pixels[pixel] = wheel(color)
+    actionpixel = pixels[pixel]
+    if actionpixel == (0, 0, 0):
+        print("PUUUURPLE TIME")
+        pixels.fill(PURPLE)
+    print("color_stroll before: " + str(actionpixel))
+    newcolor = actionpixel 
+    colormod = 10
+    if (time.monotonic() % 1) < .1:
+        colormod += random.randint(0, 100)
+        print("BOOYAH " + str(colormod))
+    def randakicka(num):
+        if random.randint(0,1) == 1:
+            newval =  num + random.randint(0, colormod)
+            if newval < 0 or newval > 255:
+                return num
+            return newval
+        else:
+            newval =  num - random.randint(0, colormod)
+            if newval < 0 or newval > 255:
+                return num
+            return newval 
+    newr = randakicka(newcolor[0])
+    newg = randakicka(newcolor[1])
+    newb = randakicka(newcolor[2]) 
+    if (time.monotonic() % 1) > .9:
+        newr = newcolor[0] - 1
+        newg = newcolor[1] + 1
+        newb = newcolor[2] - 1
+        print("GREENIFY " + str(newg))
+    newcolor = (newr, newg, newb)
+    #actionpixel = (newcolor) 
+    pixels[pixel] = (newcolor)
     pixels.show()
-    print("color_stroll: blah")
+    print("color_stroll after: " + str(actionpixel))
     time.sleep(wait)
 
 
@@ -137,7 +166,8 @@ def main():
         if runmode == "quack":
             quack(2.0)
         if runmode == "color_stroll":
-            color_stroll(2.0)
+            color_stroll(10 * random.random())
+    #pixel = random.randint(0, num_pixels - 1)
         if time.monotonic() - time_touched < 0.15:
             continue
         if touch1.value:
@@ -150,7 +180,7 @@ def main():
             pixels.show()
             time_touched = time.monotonic()
             print("{}".format({"t": time.monotonic(), "touch2": touch2}))
-        #print("{}".format({"t": time.monotonic(), "brightness": pixels.brightness, "runmode": runmode}))
+        print("{}".format({"t": time.monotonic(), "brightness": pixels.brightness, "runmode": runmode}))
 
 def intro():
     color_chase(OFF, 0.1)
