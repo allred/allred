@@ -5,7 +5,7 @@ require 'lolcat'
 require 'optparse'
 
 usage = <<"USAGE"
-Usage: #{File.basename(__FILE__)} [-c command] [-i regex_ignore] [-w watchdir]
+Usage: #{File.basename(__FILE__)} [-hv] [-c command] [-i regex_ignore] [-w watchdir]
 USAGE
 
 dir_base = "#{ENV['HOME']}/gits/allred"
@@ -27,6 +27,9 @@ OptionParser.new do |opts|
   opts.on("-i", "--ignore REGEX") do |o|
     options[:ignore] = o
   end
+  opts.on("-v", "--verbose") do |o|
+    options[:verbose] = o
+  end
 end.parse!
 
 $opts_lolcat = {
@@ -44,10 +47,13 @@ glog(usage)
 glog("watching: #{options[:watchdir]}")
 glog("command: #{options[:command]}")
 glog("ignoring: #{options[:ignore]}")
-listener = Listen.to(options[:watchdir]) do |modified, added, removed|
+options_listener = [options[:watchdir]]
+listener = Listen.to(*options_listener) do |modified, added, removed|
   dbg = {t: Time.now, modified: modified, added: added, removed: removed}
   if options[:ignore] && (modified.any?(/^.*#{options[:ignore]}$/) || added.any?(/^.*#{options[:ignore]}$/) || removed.any?(/^.*#{options[:ignore]}$/))
-    glog("IGNORING #{modified}")
+    if options[:verbose]
+      glog("IGNORING #{modified}")
+    end
     next
   end
   glog("#{dbg}")
