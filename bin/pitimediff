@@ -27,10 +27,10 @@ if (( $seconds_diff > $seconds_old_for_alert )); then
     #$python $HOME/gits/ouimeaux/client.py --device 192.168.1.21 --off
     #$python $HOME/gits/ouimeaux/client.py --device 192.168.1.21 --on
     date
-    $python -c "print('LATE ' + '👹' * 36)"
+    $python -c "print('LATE ' + '👹' * 34)"
 else
     char='👾'
     # in terminal, Edit -> Emojis
-    $python -c "print('OK ' + '🌲' * 37)"
+    $python -c "print('OK ' + '🌲' * 35)"
 fi
 

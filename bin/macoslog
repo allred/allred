@@ -1,0 +1,3 @@
+#!/bin/bash
+log show --last 1s
+# --style compact

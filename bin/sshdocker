@@ -1,0 +1,2 @@
+#!/bin/bash
+docker exec -it stoic_kepler /bin/bash

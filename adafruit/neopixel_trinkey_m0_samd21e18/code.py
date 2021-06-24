@@ -158,7 +158,7 @@ def main():
         #modimporty()
         if runmode == "default":
             #intro()
-            randpixel_randcolor(2.0)
+            randpixel_randcolor(30.0)
         if runmode == "blueblip":
             blueblip(5.0)
         if runmode == "redblip":
