@@ -1,2 +1,11 @@
 #!/bin/bash
+python="$HOME/.pyenv/versions/3.9.1/bin/python"
+
 docker build -t allred/allredbox .
+if [ $? -eq 0 ]; then
+    $python -c "print('OK ' + '🐸' * 35)"
+    say -v Veena "docker build succeeded docker build succeeded"
+else
+    $python -c "print('NO ' + '⚠️' * 65)"
+    say -v Veena "docker build failed docker build failed"
+fi
