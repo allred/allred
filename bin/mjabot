@@ -17,6 +17,7 @@ if __name__ == "__main__":
     response = wh.send(text=msg)
     assert response.status_code == 200
     assert response.body == "ok"
+    print(f"{response.body}")
 
 '''
 response = webhook.send(
