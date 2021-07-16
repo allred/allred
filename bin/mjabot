@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+#import argparse
+import os
+import sys
+from slack_sdk.webhook import WebhookClient
+
+if __name__ == "__main__":
+    #args = argparse.ArgumentParser()
+    args = sys.argv
+    url = os.environ.get("ALLRED_SLACK_WEBHOOK")
+    wh = WebhookClient(url)
+    emoji = "🫑"
+    preamble = f"{emoji}mjabot"
+    msg = f"{preamble}: el tamaño de sys.argv es 0"
+    if len(args) > 1:
+        msg = f"{preamble}: {args[1]}"
+    response = wh.send(text=msg)
+    assert response.status_code == 200
+    assert response.body == "ok"
+
+'''
+response = webhook.send(
+    text="fallback",
+    blocks=[
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": "You have a new request:\n*<fakeLink.toEmployeeProfile.com|Fred Enriquez - New device request>*"
+            }
+        }
+    ]
+)
+'''

@@ -8,10 +8,12 @@ ALLRED_CMD = "./cmd"
 
 
 build:
-	go build -v -o $(ALLRED_BIN) $(ALLRED_CMD)/glorphus
+	#go build -v -o $(ALLRED_BIN) $(ALLRED_CMD)/glorphus
+	go build -v -o $(ALLRED_BIN) $(ALLRED_CMD)/fakworker
 
 run:
-	./bin/glorphus
+	#./bin/glorphus
+	./bin/fakworker
 
 test:
 	go test

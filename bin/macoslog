@@ -1,3 +1,4 @@
 #!/bin/bash
+# mosq_sub | logger -is -t m4ersk
 log show --last 1s
 # --style compact
