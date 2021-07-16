@@ -68,10 +68,12 @@ def get_config():
 
 def get_administration_overhead(config):
     ao = config.get("me").get("administrationOverhead")
+    #ao = 1
     return ao
 
 def profit_per_unit(salesModifier, price, quality, marketSaturation, retailModeling, administrationOverhead, storeBaseSalary):
     usph = units_sold_an_hour(salesModifier, price, quality, marketSaturation, retailModeling)
+    #print(f"storeBaseSalary: {storeBaseSalary}")
     profit = price - (storeBaseSalary * administrationOverhead) / usph
     return profit
 
@@ -144,7 +146,7 @@ def gen_stores():
             hash_formula = retail_modeling_parse(retail_modeling)
             quantity = 100
             time_modeling = retail_modeling_calculate(hash_formula, average_retail_price, market_saturation, quantity)
-            sales_modifier_me = 3
+            sales_modifier_me = 5
             quality = 0
             redis_units_sold_per_hour = units_sold_an_hour(sales_modifier_me, average_retail_price, quality, market_saturation, time_modeling)
             revenue_per_hour_redis = redis_units_sold_per_hour * k.get("revenue_less_wages_per_unit")

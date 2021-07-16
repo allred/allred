@@ -1,3 +1,9 @@
+
+in static/js/Building/Building.tsx...
+const administrationCostWithExecsImpact = administrationOverhead ? getAdministrationOverheadWithExecsImpact(administrationOverhead, skillCOO) : 1;
+    const wages = (buildingConstant && building && administrationOverhead) ? buildingConstant.wages*building.size*administrationCostWithExecsImpact : null;
+
+
 Go to resource page
 https://www.simcompanies.com/encyclopedia/resource/3/
 In Chrome Devtools

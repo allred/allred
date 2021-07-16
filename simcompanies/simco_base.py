@@ -22,6 +22,8 @@ uri_api_ticker_base = f"{uri_api_base_v1}/market-ticker/"
 uri_player = "https://www.simcompanies.com/api/v2/players/me/"
 uri_resource_60 = "https://www.simcompanies.com/api/v2/market/60"
 
+redis_seconds_expire_resource = 604800
+
 silog = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.DEBUG,
@@ -49,6 +51,8 @@ def redis_hset_resource(resource_num, payload):
         f"{resource_num}:json": json.dumps(payload),
         f"{resource_num}:datetime": str(datetime.now()),
         })
+    e = r.expire(f"simco:resources.{resource_num}:datetime", redis_seconds_expire_resource)
+    e = r.expire(f"simco:resources.{resource_num}:json", redis_seconds_expire_resource)
     return n
 
 def request_resource_from_api(resource_num):
