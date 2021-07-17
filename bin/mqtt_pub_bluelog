@@ -32,7 +32,7 @@ File.open(latest_file) do |log|
     puts "publishing: #{line}"
     mqtt_pub("bluelog,#{line}".chomp())
     if /'/ =~ line
-      system("#{ENV['HOME']}/gits/allred/bin/sbot '🔵#{line}'")
+      system(%Q^#{ENV['HOME']}/gits/allred/bin/sbot "🔵#{line}"^)
     end
     system("logger bluelog,#{line}")
   end
