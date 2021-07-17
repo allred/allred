@@ -2,6 +2,8 @@ GEM
   remote: https://rubygems.org/
   specs:
     ffi (1.15.0)
+    file-tail (1.2.0)
+      tins (~> 1.0)
     listen (3.5.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -10,18 +12,25 @@ GEM
       optimist (~> 3.0.0)
       paint (~> 2.1)
     manpages (0.6.1)
+    mqtt (0.5.0)
     optimist (3.0.1)
     paint (2.2.1)
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    sync (0.5.0)
+    tins (1.29.1)
+      sync
 
 PLATFORMS
+  ruby
   x86_64-darwin-20
 
 DEPENDENCIES
+  file-tail
   listen
   lolcat
+  mqtt
 
 BUNDLED WITH
    2.2.17

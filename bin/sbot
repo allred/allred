@@ -10,7 +10,7 @@ if __name__ == "__main__":
     url = os.environ.get("ALLRED_SLACK_WEBHOOK")
     wh = WebhookClient(url)
     emoji = "🫑"
-    preamble = f"{emoji}mjabot"
+    preamble = f"{emoji}sbot"
     msg = f"{preamble}: el tamaño de sys.argv es 0"
     if len(args) > 1:
         msg = f"{preamble}: {args[1]}"

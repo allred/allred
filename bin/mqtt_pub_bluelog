@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+$: << File.join(File.dirname(__FILE__), '..', 'lib')
+require 'bundler/setup'
+require 'file-tail'
+require 'mqtt'
+
+@dir_watch = "#{ENV['HOME']}/gits/piloto/log/btoothlog"
+#@dir_watch = "#{ENV['HOME']}/tmp"
+@tail_backward = 0
+
+def latest_file
+  latest_file = Dir.glob("#{@dir_watch}/*.log").sort { |a,b| File.mtime(a) <=> File.mtime(b) }
+  return latest_file[-1]
+end
+
+def mqtt_pub(msg)
+  cmd = "mosquitto_pub -h broker.hivemq.com -t allred/meta -m '#{msg}'"
+  system(cmd)
+  return cmd
+end
+
+latest_file = latest_file()
+msg_startup="🔵watching #{latest_file}"
+system("#{ENV['HOME']}/gits/allred/bin/sbot #{msg_startup}")
+mqtt_pub("#{__FILE__} started #{Time.now}".chomp())
+puts msg_startup 
+#system("logger ${msg_startup}")
+File.open(latest_file) do |log|
+  log.extend(File::Tail)
+  log.backward(@tail_backward)
+  log.tail do |line|
+    puts "publishing: #{line}"
+    mqtt_pub("bluelog,#{line}".chomp())
+    if /'/ =~ line
+      system("#{ENV['HOME']}/gits/allred/bin/sbot '🔵#{line}'")
+    end
+    system("logger bluelog,#{line}")
+  end
+end
