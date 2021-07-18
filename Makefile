@@ -10,10 +10,12 @@ ALLRED_CMD = "./cmd"
 build:
 	#go build -v -o $(ALLRED_BIN) $(ALLRED_CMD)/glorphus
 	go build -v -o $(ALLRED_BIN) $(ALLRED_CMD)/fakworker
+	go build -v -o $(ALLRED_BIN) $(ALLRED_CMD)/hobo1090
 
 run:
 	#./bin/glorphus
-	./bin/fakworker
+	#./bin/fakworker
+	./bin/hobo1090
 
 test:
 	go test
