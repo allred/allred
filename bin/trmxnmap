@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import nmap
 import os
+import socket
 import subprocess
 
 def tscan(iprange):
@@ -17,6 +18,18 @@ def deepscan(target):
     for line in subprocess.check_output(cmd_ping, shell=True).decode().split('\n'):
         print(line)
     
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
 
 def pingscan(target):
     cmd_ping = f"nmap -R -sn -oG - --system-dns {target}" 
@@ -24,7 +37,11 @@ def pingscan(target):
     return outlist
 
 if __name__ == "__main__":
-    target = "192.168.1.0/24"
+    targeta = get_ip().split('.')
+    targeta[3] = "0"
+    targets = '.'.join(targeta)
+    print(targets)
+    target = f"{targets}/24"
     #target = "127.0.0.1"
     #tscan(target)
     for line in pingscan(target):
