@@ -1,0 +1,4 @@
+#!/bin/bash
+pid=$(pgrep 'gnome-shell$')
+kill -1 $pid
+
