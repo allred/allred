@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+#rm -v go.mod go.sum
+#go mod init github.com/allred/bluechunx
+#go mod tidy

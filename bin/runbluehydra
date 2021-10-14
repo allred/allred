@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+cd $HOME/gits/blue_hydra
+sudo bundle exec ./bin/blue_hydra

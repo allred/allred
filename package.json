@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/allred/allred#readme",
   "dependencies": {
-    "lolcatjs": "^2.4.1"
+    "command-line-args": "^5.2.0",
+    "lolcatjs": "^2.4.1",
+    "puppeteer": "^10.4.0"
   }
 }
