@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+sudo snap install scrcpy
+scrcpy
+echo "* to kill run: scrcpy.adb kill-server"
