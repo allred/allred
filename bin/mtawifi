@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+sudo nmcli device wifi list|grep MTA && echo "m t eh"|festival --tts
