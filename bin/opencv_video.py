@@ -12,7 +12,7 @@ file_cap = "76-20210713163948.mkv"
 dir_out = f"{os.environ['HOME']}/tmp/opencv"
 file_out = f"{file_cap}.mp4"
 path_ffmpeg = "/usr/local/bin/ffmpeg"
-path_ffmpeg = "/home/linuxbrew/.linuxbrew/bin/ffmpeg"
+path_ffmpeg = "$HOMEBREW_PREFIX/bin/ffmpeg"
 
 #cmd_conv = f"{path_ffmpeg} -y -i {dir_caps}/{file_cap} -codec copy {dir_out}/{file_out}"
 #subprocess.run(cmd_conv.split(" "))
@@ -57,6 +57,16 @@ if __name__ == '__main__':
         f"{dir_caps}/{file_cap}",
             ]
     files = glob.glob(f"{dir_caps}/*")
+    files_skip = [ 
+        "25-20210803170736.mkv",
+        "3317-20210930124816.mkv",
+        "2446-20210928095905.mkv",
+        "25-20210803170736.mkv",
+            ]
     for f in files:
-        print(f"processing {f}")
+        if f in files_skip:
+            print(f"SKIPPING {f}")
+            continue
+        print(f"processing {f}", end='')
         process_file(f)
+        print("")

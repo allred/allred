@@ -1,0 +1,169 @@
+#!/usr/bin/env node
+// take a very exciting robo-web-tour
+// TODO:
+// * avoid downloading pdfs etc, maybe just skip "pdf" regex
+// * also .zip files
+// * figure out mailto issue
+const commandLineArgs = require('command-line-args')
+const fs = require('fs')
+const lolcatjs = require('lolcatjs')
+const { promisify } = require('util')
+const puppeteer = require('puppeteer')
+const exec = promisify(require('child_process').exec)
+
+// ensure href is valid (ie starts with "http" at least)
+// skip and filter unwanted links
+const regexValidURL = new RegExp('^http')
+const regexSkip = new RegExp('mailto')
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getRandHref(hrefs) {
+    let reduced = hrefs.reduce(function(filtered, href) {
+        if (regexValidURL.test(href) && !regexSkip.test(href)) {
+            filtered.push(href)
+        }
+        return filtered
+    }, [])
+    url = hrefs[Math.floor(Math.random() * hrefs.length)]
+    return url
+}
+
+function main() {
+    (async () => {
+        let url_wp = "https://en.wikipedia.org/wiki/Main_Page"
+        let urlsEntryPoints = [
+            'https://redditp.com/r/imaginarylandscapes',
+            'https://redditp.com/r/wallpaper',
+            'https://redditp.com/r/wallpaperengine',
+            'https://redditp.com/r/wallpapers',
+        ]
+
+        const optionDefinitions = [
+            {name: 'file', alias: 'f', type: String, defaultValue: null},
+            {name: 'pause', alias: 'p', type: String, defaultValue: 60},
+            {name: 'timeout', alias: 't', type: String, defaultValue: null}, // switch the complete site after n seconds
+            {name: 'url', alias: 'u', type: String, defaultValue: getRandHref(urlsEntryPoints)},
+        ]
+        const arguments = commandLineArgs(optionDefinitions)
+        const {file, pause, timeout, url} = arguments
+
+        stringBanner = "[YEAAAAAAH]"
+        lolstring = lolcatjs.fromString(stringBanner)
+
+        // read in the file, a list of URLs
+        let infile = '/home/mallred/s/bin/sp.txt'
+        if (file) {
+          infile = file 
+          urlsEntryPoints = []
+        }
+
+        try {   
+        var lineReader = require('readline').createInterface({
+                input: require('fs').createReadStream(infile)
+        })
+        } catch {
+          console.log("error")    }
+        for await (const line of lineReader) {
+            if (file && line && regexValidURL.test(line)) {
+                console.log('loading: ', line)
+                urlsEntryPoints.push(line)
+            }
+        }
+        console.log({"urlsEntryPoints": urlsEntryPoints})
+
+        let url_next = url
+        url_next = getRandHref(urlsEntryPoints)
+        let loop_sleep_secs = pause 
+
+        const wait = async () => {
+            if (pause) {
+                //page.waitFor(pause)
+            }
+        }
+    
+        const browser = await puppeteer.launch({
+            headless: false,
+            ignoreHTTPSErrors: true,
+            /* REMOVEs THE INFOBAR BUT DOESN'T GO FULL SCREEN
+            ignoreDefaultArgs: [
+                "--enable-automation",
+            ],
+            */
+            args: [
+                '--app-id dmghijelimhndkbmpgbldicpogfkceaj',
+                '--dark',
+                //'--disable-infobars',
+                '--disable-pinch',
+                //'--enable-automation',
+                //'--enable-features=Automation',
+                //'--enable-blink-features=IdleDetection',
+                '--enable-features=WebUIDarkMode',
+                '--force-dark-mode',
+                '--kiosk',
+                //--load-extension pathToSomeExtension
+                '--start-fullscreen',
+                //'--user-data-dir=/tmp', FAIL
+                //'--profile-directory=BOOYAHMYLORD', FAIL AF
+            ]
+        });
+        const page = await browser.newPage()
+        await page.setCacheEnabled(true)
+        await page.setViewport({
+            width: 0,
+            height: 0,
+            deviceScaleFactor: 1,
+        })
+        page.emulateMediaFeatures([{
+            name: 'prefers-color-scheme', value: 'dark'
+        }])
+        let step = 0
+        const now = new Date()
+        const tStart = secondsSinceEpoch = Math.round(now.getTime() / 1000)
+        while(1) {
+            let tIdle = await exec('xprintidle')
+            tIdle = tIdle.stdout.trim()
+            if (tIdle < 5000) {
+                await sleep(1000)
+                //continue 
+            }
+            //console.log(step + ' idle: ' + tIdle + ' ' + url_next)
+            try {
+                page.emulateMediaFeatures([{
+                    name: 'prefers-color-scheme', value: 'dark'
+                }])
+                await page.goto(url_next);
+            } catch (error) {
+                console.error(error)
+                url_next = 'http://corndog.io' 
+                sleep(1000)
+            }
+
+            let hrefs = []
+            try {
+                hrefs = await page.$$eval('a', as => as.map(a => a.href))
+            } catch (error) {
+                console.error(error)
+                hrefs = urlsEntryPoints
+            }
+            url_next = getRandHref(hrefs) 
+            //url_next = getRandHref(urlsEntryPoints)
+            //console.log(JSON.stringify(hrefs))
+
+            if (secondsSinceEpoch = Math.round(now.getTime() - tStart > timeout) / 1000) {
+              url_next = getRandHref(urlsEntryPoints) 
+            }
+
+            let ostring = step + ' links:' + hrefs.length + ' xprintidle:' + tIdle + ' next: ' + url_next
+            lolstring = lolcatjs.fromString(ostring)
+            //console.log(ostring)
+            await sleep(loop_sleep_secs * 1000)
+            step += 1
+        }
+        await browser.close();
+    })()
+}
+
+main()
