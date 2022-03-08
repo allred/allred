@@ -35,6 +35,10 @@ function main() {
     (async () => {
         let url_wp = "https://en.wikipedia.org/wiki/Main_Page"
         let urlsEntryPoints = [
+            'https://eyebleach.me',
+            'https://mapcrunch.com',
+            'https://mikeallred.com',
+            'https://pointerpointer.com',
             'https://redditp.com/r/imaginarylandscapes',
             'https://redditp.com/r/PixelArt',
             'https://redditp.com/r/wallpaper',
@@ -114,7 +118,8 @@ function main() {
                 '--start-fullscreen',
                 //'--user-data-dir=/tmp', FAIL
                 //'--profile-directory=BOOYAHMYLORD', FAIL AF
-            ]
+            ],
+            defaultViewport: null,
         });
         const page = await browser.newPage()
         await page.setCacheEnabled(true)
@@ -130,14 +135,22 @@ function main() {
         const now = new Date()
         const tStart = secondsSinceEpoch = Math.round(now.getTime() / 1000)
         while(1) {
+
+            /*
             let tIdle = await exec('xprintidle')
             tIdle = tIdle.stdout.trim()
             if (tIdle < 5000) {
                 await sleep(1000)
                 //continue 
             }
+            */
             //console.log(step + ' idle: ' + tIdle + ' ' + url_next)
             try {
+                await page.setViewport({
+                    width: 0,
+                    height: 0,
+                    deviceScaleFactor: 1,
+                })
                 page.emulateMediaFeatures([{
                     name: 'prefers-color-scheme', value: 'dark'
                 }])
@@ -163,9 +176,24 @@ function main() {
               url_next = getRandHref(urlsEntryPoints) 
             }
 
-            let ostring = step + ' links:' + hrefs.length + ' xprintidle:' + tIdle + ' next: ' + url_next
+            //let ostring = step + ' links:' + hrefs.length + ' xprintidle:' + tIdle + ' next: ' + url_next
+            let ostring = step + ' links:' + hrefs.length + ' next: ' + url_next
             lolstring = lolcatjs.fromString(ostring)
             //console.log(ostring)
+            try {
+                await page.setViewport({
+                    width: 0,
+                    height: 0,
+                    deviceScaleFactor: 1,
+                })
+                page.emulateMediaFeatures([{
+                    name: 'prefers-color-scheme', value: 'dark'
+                }])
+            } catch (error) {
+                console.error(error)
+                //url_next = 'http://corndog.io' 
+                //sleep(1000)
+            }
             await sleep(loop_sleep_secs * 1000)
             step += 1
         }
