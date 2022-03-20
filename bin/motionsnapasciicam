@@ -2,11 +2,11 @@
 # get a snapshot from a streaming "motion" server and convert to ascii
 HOST=${1:-"localhost"}
 MOTIONHOST="$HOST:8081"
-DATETIME=`date +%Y%m%d%H%M%S`
+tmpfile="/tmp/motionsnap.jpg"
 
 while [ 1 ]; do
-    #clear
-    ffmpeg -loglevel fatal -i http://$MOTIONHOST -vframes 1 -r 1 -y /tmp/$DATETIME.jpg 
-    jp2a --size=79x24 --background=dark --color /tmp/$DATETIME.jpg
-    #sleep 1
+    width=$(tput cols)
+    height=$(tput lines)
+    ffmpeg -loglevel fatal -i http://$MOTIONHOST -vframes 1 -r 1 -y $tmpfile \
+    && jp2a --size="${width}x${height}" --background=dark --color $tmpfile 
 done
