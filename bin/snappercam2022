@@ -1,0 +1,3 @@
+#!/bin/bash
+
+fswebcam -ql --jpeg - | jp2a - --size=78x20 --background=dark --color

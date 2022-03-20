@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+import nmcli
+import os
+import platform
+import redis
+import time
+
+def main():
+    epoch = time.time()
+    for x in nmcli.device.wifi():
+        #print(x)
+        # chan freq rate security
+        print(epoch, x.bssid, x.signal, x.ssid)
+
+if __name__ == '__main__':
+    host = platform.node()
+    print(host)
+    hashname_redis = f"nmcli:{host}"
+    r = redis.Redis.from_url("redis://" + os.environ["BLUECHUNX_REDIS_URL"])
+    while True:
+        main()
+        time.sleep(1)

@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+unbuffer nmcli device wifi list|cat

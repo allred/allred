@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+iface="wlan0"
+sleep=3
+while [ 1 ]; do
+	# cat /proc/device-tree/model
+  #sudo nmcli device wifi list|grep MTA && echo "m t eh"|festival --tts
+  # raspberry pi
+  sudo iwlist $iface scan|grep MTA
+  if [ $? -eq 0 ]; then
+	  echo "MTA MOFO"
+      $HOME/gits/piloto/scripts/mosq_pub "$(date +%Y%m%d@%T),$(hostname),MTAMOFO"
+  fi
+  sleep $sleep
+done 

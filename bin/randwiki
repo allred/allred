@@ -1,0 +1,135 @@
+#!/usr/bin/env node
+// take a very exciting robo-web-tour
+// TODO:
+// * avoid downloading pdfs etc, maybe just skip "pdf" regex
+// * also .zip files
+// * figure out mailto issue
+const commandLineArgs = require('command-line-args')
+const lolcatjs = require('lolcatjs')
+const { promisify } = require('util')
+const puppeteer = require('puppeteer')
+const exec = promisify(require('child_process').exec)
+
+function puppu(browser, urlarg, timeoutarg) {
+  (async () => {
+    const url = process.argv[2] || urlarg
+    const timeout = process.argv[3] || timeoutarg 
+    const hrefs = await page.$$eval('a', as => as.map(a => a.href))
+  })();
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getRandHref(hrefs) {
+    // ensure href is valid (ie starts with "http" at least)
+    const regexValid = new RegExp('^http')
+    let reduced = hrefs.reduce(function(filtered, href) {
+        if (regexValid.test(href)) {
+            filtered.push(href)
+        }
+        return filtered
+    }, [])
+    url = hrefs[Math.floor(Math.random() * hrefs.length)]
+    return url
+}
+
+function main() {
+    (async () => {
+        let url_wp = "https://en.wikipedia.org/wiki/Main_Page"
+        let iterations_max = 30
+        const optionDefinitions = [
+            {name: 'pause', alias: 'p', type: String, defaultValue: 60},
+            {name: 'url', alias: 'u', type: String, defaultValue: url_wp},
+        ]
+        let urlsEntryPoints = [
+            //'http://boardgamegeek.com',
+            'https://marvel.com',
+            'https://mikeallred.com',
+            //'https://news.google.com',
+            'https://pinterest.com',
+            'https://reddit.com',
+            'https://tenor.com',
+            //'https://vixen.com',
+        ]
+        const arguments = commandLineArgs(optionDefinitions)
+        const {pause, url} = arguments
+        let url_next = url
+        let loop_sleep_secs = pause 
+
+        const wait = async () => {
+            if (pause) {
+                page.waitFor(pause)
+            }
+        }
+    
+        const browser = await puppeteer.launch({
+            headless: false,
+            ignoreHTTPSErrors: true,
+            args: [
+                '--app-id dmghijelimhndkbmpgbldicpogfkceaj',
+                '--dark',
+                '--enable-features=WebUIDarkMode',
+                '--force-dark-mode',
+                //--load-extension pathToSomeExtension
+                '--start-fullscreen'
+            ]
+        });
+        const page = await browser.newPage();
+        await page.setViewport({
+            width: 0,
+            height: 0,
+            deviceScaleFactor: 1,
+        })
+        page.emulateMediaFeatures([{
+            name: 'prefers-color-scheme', value: 'dark'
+        }])
+        //for (let step = 0; step < iterations_max; step++) {
+        let step = 0
+        while(1) {
+            let tIdle = await exec('xprintidle')
+            tIdle = tIdle.stdout.trim()
+            if (tIdle < 5000) {
+                await sleep(1000)
+                continue 
+            }
+            //console.log(step + ' idle: ' + tIdle + ' ' + url_next)
+            try {
+                page.emulateMediaFeatures([{
+                    name: 'prefers-color-scheme', value: 'dark'
+                }])
+                await page.goto(url_next);
+            } catch (error) {
+                console.error(error)
+                //url_next = getRandHref(urlsEntryPoints)
+                url_next = 'http://corndog.io' 
+                sleep(1000)
+            }
+
+            let hrefs = []
+            try {
+                hrefs = await page.$$eval('a', as => as.map(a => a.href))
+            } catch (error) {
+                console.error(error)
+                hrefs = urlsEntryPoints
+            }
+            if (hrefs.length == 0) {
+                console.log('NO HREFS')
+                url_next = getRandHref(urlsEntryPoints)
+                continue
+            }
+            //url_next = hrefs[Math.floor(Math.random() * hrefs.length)]
+            url_next = getRandHref(hrefs) 
+            //console.log(JSON.stringify(hrefs))
+            let ostring = step + ' links:' + hrefs.length + ' idle:' + tIdle + ' next: ' + url_next
+            lolstring = lolcatjs.fromString(ostring)
+            //console.log(ostring)
+            await sleep(loop_sleep_secs * 1000)
+            step += 1
+        }
+        await browser.close();
+    })()
+}
+
+main()
