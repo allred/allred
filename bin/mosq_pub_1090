@@ -1,0 +1,2 @@
+#!/bin/bash
+nc localhost 30003 | mosquitto_pub -h localhost -t 1090 -l
