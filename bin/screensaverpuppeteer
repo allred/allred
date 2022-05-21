@@ -199,7 +199,6 @@ function main() {
             }
 
             if (screenshot) {
-                console.log(screenshot)
                await page.screenshot({
                   fullPage: true,
                    path: screenshot,
