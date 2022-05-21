@@ -53,11 +53,12 @@ function main() {
         const optionDefinitions = [
             {name: 'file', alias: 'f', type: String, defaultValue: null},
             {name: 'pause', alias: 'p', type: String, defaultValue: 60},
+            {name: 'screenshot', alias: 's', type: String, defaultValue: null},
             {name: 'timeout', alias: 't', type: String, defaultValue: null}, // switch the complete site after n seconds
             {name: 'url', alias: 'u', type: String, defaultValue: getRandHref(urlsEntryPoints)},
         ]
         const arguments = commandLineArgs(optionDefinitions)
-        const {file, pause, timeout, url} = arguments
+        const {file, pause, screenshot, timeout, url} = arguments
 
         stringBanner = "[YEAAAAAAH]"
         lolstring = lolcatjs.fromString(stringBanner)
@@ -195,9 +196,15 @@ function main() {
                 }])
             } catch (error) {
                 console.error(error)
-                //url_next = 'http://corndog.io' 
-                //sleep(1000)
             }
+
+            if (screenshot) {
+                console.log(screenshot)
+               await page.screenshot({
+                  fullPage: true,
+                   path: screenshot,
+               })
+             }
             await sleep(loop_sleep_secs * 1000)
             step += 1
         }
