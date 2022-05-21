@@ -10,11 +10,15 @@ const lolcatjs = require('lolcatjs')
 const { promisify } = require('util')
 const puppeteer = require('puppeteer')
 const exec = promisify(require('child_process').exec)
+//const tmp = require('tmp')
+//import {getWallpaper, setWallpaper} from 'wallpaper'
+//const wallpaper = require('wallpaper')
 
 // ensure href is valid (ie starts with "http" at least)
 // skip and filter unwanted links
 const regexValidURL = new RegExp('^http')
 const regexSkip = new RegExp('mailto')
+
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -35,7 +39,7 @@ function main() {
     (async () => {
         let url_wp = "https://en.wikipedia.org/wiki/Main_Page"
         let urlsEntryPoints = [
-            'https://eyebleach.me',
+            'https://eyebleach.me/nature',
             'https://mapcrunch.com',
             'https://mikeallred.com',
             'https://pointerpointer.com',
