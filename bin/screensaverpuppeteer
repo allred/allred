@@ -126,7 +126,7 @@ function main() {
             ],
             defaultViewport: null,
         });
-        const page = await browser.newPage()
+        const [page] = await browser.pages()
         await page.setCacheEnabled(true)
         await page.setViewport({
             width: 0,
