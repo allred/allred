@@ -120,6 +120,7 @@ function main() {
             
         if (!nokiosk) {
            customArgs.push('--kiosk')
+           customArgs.push('--no-sandbox')
            customArgs.push('--start-fullscreen')
         }
         
