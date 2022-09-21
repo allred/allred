@@ -52,13 +52,14 @@ function main() {
 
         const optionDefinitions = [
             {name: 'file', alias: 'f', type: String, defaultValue: null},
+            {name: 'nokiosk', alias: 'k', type: Boolean, defaultValue: false},
             {name: 'pause', alias: 'p', type: String, defaultValue: 60},
             {name: 'screenshot', alias: 's', type: String, defaultValue: null},
             {name: 'timeout', alias: 't', type: String, defaultValue: null}, // switch the complete site after n seconds
             {name: 'url', alias: 'u', type: String, defaultValue: getRandHref(urlsEntryPoints)},
         ]
         const arguments = commandLineArgs(optionDefinitions)
-        const {file, pause, screenshot, timeout, url} = arguments
+        const {file, nokiosk, pause, screenshot, timeout, url} = arguments
 
         stringBanner = "[YEAAAAAAH]"
         lolstring = lolcatjs.fromString(stringBanner)
@@ -99,16 +100,8 @@ function main() {
                 //page.waitFor(pause)
             }
         }
-    
-        const browser = await puppeteer.launch({
-            headless: false,
-            ignoreHTTPSErrors: true,
-            /* REMOVEs THE INFOBAR BUT DOESN'T GO FULL SCREEN
-            ignoreDefaultArgs: [
-                "--enable-automation",
-            ],
-            */
-            args: [
+
+             let customArgs = [
                 '--app-id dmghijelimhndkbmpgbldicpogfkceaj',
                 '--dark',
                 //'--disable-infobars',
@@ -118,12 +111,27 @@ function main() {
                 //'--enable-blink-features=IdleDetection',
                 '--enable-features=WebUIDarkMode',
                 '--force-dark-mode',
-                '--kiosk',
+                //'--kiosk',
                 //--load-extension pathToSomeExtension
-                '--start-fullscreen',
+                //'--start-fullscreen',
                 //'--user-data-dir=/tmp', FAIL
                 //'--profile-directory=BOOYAHMYLORD', FAIL AF
+            ]
+            
+        if (!nokiosk) {
+           customArgs.push('--kiosk')
+           customArgs.push('--start-fullscreen')
+        }
+        
+        const browser = await puppeteer.launch({
+            headless: false,
+            ignoreHTTPSErrors: true,
+            /* REMOVEs THE INFOBAR BUT DOESN'T GO FULL SCREEN
+            ignoreDefaultArgs: [
+                "--enable-automation",
             ],
+            */
+            args: customArgs,
             defaultViewport: null,
         });
         const [page] = await browser.pages()
