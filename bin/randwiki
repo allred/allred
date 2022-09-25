@@ -51,7 +51,6 @@ function main() {
             'https://pinterest.com',
             'https://reddit.com',
             'https://tenor.com',
-            //'https://vixen.com',
         ]
         const arguments = commandLineArgs(optionDefinitions)
         const {pause, url} = arguments
@@ -60,7 +59,7 @@ function main() {
 
         const wait = async () => {
             if (pause) {
-                page.waitFor(pause)
+                //page.waitFor(pause)
             }
         }
     
@@ -74,9 +73,12 @@ function main() {
                 '--force-dark-mode',
                 //--load-extension pathToSomeExtension
                 '--start-fullscreen'
-            ]
+            ],
+            defaultViewport: null,
         });
-        const page = await browser.newPage();
+        //const page = await browser.newPage();
+        const [page] = await browser.pages() 
+        await page.setCacheEnabled(true)
         await page.setViewport({
             width: 0,
             height: 0,
