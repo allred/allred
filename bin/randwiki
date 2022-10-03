@@ -51,7 +51,6 @@ function main() {
             'https://pinterest.com',
             'https://reddit.com',
             'https://tenor.com',
-            //'https://vixen.com',
         ]
         const arguments = commandLineArgs(optionDefinitions)
         const {pause, url} = arguments
@@ -60,7 +59,7 @@ function main() {
 
         const wait = async () => {
             if (pause) {
-                page.waitFor(pause)
+                //page.waitFor(pause)
             }
         }
     
@@ -74,9 +73,12 @@ function main() {
                 '--force-dark-mode',
                 //--load-extension pathToSomeExtension
                 '--start-fullscreen'
-            ]
+            ],
+            defaultViewport: null,
         });
-        const page = await browser.newPage();
+        //const page = await browser.newPage();
+        const [page] = await browser.pages() 
+        await page.setCacheEnabled(true)
         await page.setViewport({
             width: 0,
             height: 0,
@@ -88,12 +90,14 @@ function main() {
         //for (let step = 0; step < iterations_max; step++) {
         let step = 0
         while(1) {
+            /*
             let tIdle = await exec('xprintidle')
             tIdle = tIdle.stdout.trim()
             if (tIdle < 5000) {
                 await sleep(1000)
                 continue 
             }
+            */
             //console.log(step + ' idle: ' + tIdle + ' ' + url_next)
             try {
                 page.emulateMediaFeatures([{
@@ -122,7 +126,7 @@ function main() {
             //url_next = hrefs[Math.floor(Math.random() * hrefs.length)]
             url_next = getRandHref(hrefs) 
             //console.log(JSON.stringify(hrefs))
-            let ostring = step + ' links:' + hrefs.length + ' idle:' + tIdle + ' next: ' + url_next
+            let ostring = step + ' links:' + hrefs.length + ' next: ' + url_next
             lolstring = lolcatjs.fromString(ostring)
             //console.log(ostring)
             await sleep(loop_sleep_secs * 1000)
