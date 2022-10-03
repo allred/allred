@@ -1,0 +1,20 @@
+#!/bin/bash
+export DISPLAY=:0
+
+urls=(\
+'https://youtu.be/watch?v=KGuCGd726RA',\
+'https://youtu.be/NLhxcyzXQxM',\
+'https://youtu.be/gEydlXOX6DU',\
+)
+# key:
+# bklyn bridge kg
+# florida beach sunset? nl
+# coast guard harbor gov island ge
+
+#'https://youtu.be/watch?v=srlpC5tmhYs'\
+#urls=('https://youtu.be/watch?v=srlpC5tmhYs')
+
+randurl=${urls[ $RANDOM % ${#urls[@]} ]}
+echo "DBG: $randurl"
+
+vlc --fullscreen $randurl

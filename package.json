@@ -23,6 +23,7 @@
     "command-line-args": "^5.2.0",
     "lolcatjs": "^2.4.1",
     "node-lifx-lan": "^0.5.0",
+    "npm": "^8.19.2",
     "puppeteer": "^10.4.0"
   }
 }

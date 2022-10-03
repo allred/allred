@@ -1,0 +1,9 @@
+#!/bin/bash
+TIMEOUTGONG="20m"
+SLEEPSECS=5
+export DISPLAY=:0
+
+while [ 1 ]; do
+  timeout $TIMEOUTGONG mjrp3randomstream
+  sleep $SLEEPSECS
+done
