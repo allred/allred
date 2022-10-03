@@ -1,20 +1,27 @@
 #!/bin/bash
 export DISPLAY=:0
 
-urls=(\
-'https://youtu.be/watch?v=KGuCGd726RA',\
-'https://youtu.be/NLhxcyzXQxM',\
-'https://youtu.be/gEydlXOX6DU',\
-)
-# key:
-# bklyn bridge kg
-# florida beach sunset? nl
-# coast guard harbor gov island ge
+urlBklnBrdg='https://youtu.be/watch?v=KGuCGd726RA'
+urlHarborBk='https://youtu.be/NLhxcyzXQxM'
+urlBeachyThang='https://youtu.be/gEydlXOX6DU'
+urlLaGrangeKY='https://youtu.be/1s9AHnu99d8'
+urlAshlandVA='https://youtu.be/VIwzSSGbxZw'
+urlFairportNY='https://youtu.be/eVwn3bbSXBw'
+urlDeerFieldBeachPierFL='https://www.youtube.com/watch?v=-eqdD8qKBbM'
+urlMauiWhalerCondo='https://www.youtube.com/watch?v=NDlw16c-rFM'
+urlTimesSquareNY='https://www.youtube.com/watch?v=1-iS7LArMPA'
+urlMontereyAquarium='https://youtu.be/pT9_HJr-nso'
+urlLeavenworthWA='https://www.youtube.com/watch?v=DxgiDvNDjoA'
+urls=($urlBeachyThang, $urlHarborBk, $urlBklnBrdg, $urlLaGrangeKY, $urlAshlandVA, $urlFairportNY, $urlDeerFieldBeachPierFL, $urlMauiWhalerCondo, $urlTimesSquareNY, $urlMontereyAquarium, $urlLeavenworthWA)
 
+# bryant park seems broken at our resolution
 #'https://youtu.be/watch?v=srlpC5tmhYs'\
 #urls=('https://youtu.be/watch?v=srlpC5tmhYs')
 
-randurl=${urls[ $RANDOM % ${#urls[@]} ]}
-echo "DBG: $randurl"
+randindex="$(expr $RANDOM % ${#urls[@]})"
+echo "DBH RANDINDEX : $randindex"
+#randurl=${urls[ $RANDOM % ${#urls[@]} ]}
+randurl=${urls[${randindex}]}
+echo "DBG RANDURL : $randurl"
 
-vlc --fullscreen $randurl
+vlc --fullscreen $randurl | tee $HOME/log/mjrp3manual.log
