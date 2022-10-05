@@ -1,9 +1,9 @@
 #!/bin/bash
-TIMEOUTGONG="60s"
+TIMEOUTGONG="300s"
 SLEEPSECS=2
 export DISPLAY=:0
 
 while [ 1 ]; do
-  timeout $TIMEOUTGONG mjrp3randomstream
+  timeout $TIMEOUTGONG $HOME/gits/allred/bin/mjrp3randomstream
   sleep $SLEEPSECS
 done
