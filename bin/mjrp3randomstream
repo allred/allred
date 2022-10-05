@@ -4,7 +4,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 echo "SCRIPT_DIR: $SCRIPT_DIR"
 
 URLS_STREAM=$(cat $SCRIPT_DIR/mjrp3.json | jq .[][] | tr -d '"')
-readarray -d "\n" -t urls <<<"$URLS_STREAM" 
+readarray -t urls <<<"$URLS_STREAM" 
 #urls=($urlBeachyThang, $urlHarborBk, $urlBklnBrdg, $urlLaGrangeKY, $urlAshlandVA, $urlFairportNY, $urlDeerFieldBeachPierFL, $urlMauiWhalerCondo, $urlTimesSquareNY, $urlMontereyAquarium, $urlLeavenworthWA)
 
 # Bryant Park seems to be broken at our resolution 
