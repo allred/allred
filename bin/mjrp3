@@ -1,9 +1,10 @@
 #!/bin/bash
 TIMEOUTGONG="300s"
-SLEEPSECS=2
+SLEEPSECS=1
 export DISPLAY=:0
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 while [ 1 ]; do
-  timeout $TIMEOUTGONG $HOME/gits/allred/bin/mjrp3randomstream
+  timeout $TIMEOUTGONG $HOME/gits/allred/bin/mjrp3randomstream | tee $HOME/log/mjrp3.log
   sleep $SLEEPSECS
 done
