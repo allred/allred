@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/allred/allred#readme",
   "dependencies": {
+    "amtrak": "^2.8.9",
     "command-line-args": "^5.2.0",
     "lolcatjs": "^2.4.1",
     "node-lifx-lan": "^0.5.0",
