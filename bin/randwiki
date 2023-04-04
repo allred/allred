@@ -42,6 +42,7 @@ function main() {
         const optionDefinitions = [
             {name: 'pause', alias: 'p', type: String, defaultValue: 60},
             {name: 'url', alias: 'u', type: String, defaultValue: url_wp},
+		{name: 'nokiosk', alias: 'k', type: Boolean, defaultValue: false},
         ]
         let urlsEntryPoints = [
             //'http://boardgamegeek.com',
@@ -53,7 +54,7 @@ function main() {
             'https://tenor.com',
         ]
         const arguments = commandLineArgs(optionDefinitions)
-        const {pause, url} = arguments
+        const {pause, url, nokiosk} = arguments
         let url_next = url
         let loop_sleep_secs = pause 
 
@@ -62,18 +63,24 @@ function main() {
                 //page.waitFor(pause)
             }
         }
-    
-        const browser = await puppeteer.launch({
-            headless: false,
-            ignoreHTTPSErrors: true,
-            args: [
+
+    customArgs = [
                 '--app-id dmghijelimhndkbmpgbldicpogfkceaj',
                 '--dark',
                 '--enable-features=WebUIDarkMode',
                 '--force-dark-mode',
                 //--load-extension pathToSomeExtension
-                '--start-fullscreen'
-            ],
+                //'--start-fullscreen'
+		]
+if (!nokiosk) {
+	customArgs.push('--kiosk')
+	customArgs.push('--no-sandbox')
+	customArgs.push('--start-fullscreen')
+}
+        const browser = await puppeteer.launch({
+		            headless: false,
+            ignoreHTTPSErrors: true,
+            args: customArgs,
             defaultViewport: null,
         });
         //const page = await browser.newPage();

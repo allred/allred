@@ -1,0 +1,122 @@
+#!/usr/bin/env node
+const { exec } = require("child_process")
+const commandLineArgs = require('command-line-args')
+printthismany = 100
+lolset = [
+	'alien',
+	'aliens',
+	'cocktail',
+	'coin',
+	'deciduous_tree',
+	'evergreen_tree',
+	'ghost',
+	'green_apple',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'large_green_square',
+	'leafy_green',
+	'moyai',
+	'mountain',
+	'mushroom',
+	'palm_tree',
+	'very_high',
+	'weed',
+]
+
+/*
+ if (parseInt(Math.floor(Math.random() * 10))) == 3) {
+	lolset.push('aliens')
+ }
+ if (Math.floor(Math.random() * 10)) == 3) {
+	lolset.push('mouse')
+ }
+ if (Math.floor(Math.random() * 20)) == 3) {
+	lolset.push('crunk')
+ }
+ if (Math.floor(Math.random() * 10)) == 3) {
+	lolset.push('wtf2')
+ }
+ */
+
+
+const optionDefinitions = [
+	{name: 'emoj', alias: 'e', type: String, defaultValue: false},
+	{name: 'lol', alias: 'l', type: String, defaultValue: "lol"},
+	{name: 'num', alias: 'n', type: String, defaultValue: 100},
+	{name: 'rand', alias: 'r', type: String, defaultValue: false},
+]
+const arguments = commandLineArgs(optionDefinitions)
+const {emoj, lol, num, rand} = arguments
+
+
+s = ""
+if (rand) {
+	// TODO: if we also have -l, append that to lolset
+	if (lol) {
+		lolset.push(lol)
+	}
+    		randnum = Math.floor(Math.random() * 3)
+	s = rando(num + randnum) // plus some random n!
+}
+else if (emoj) {
+	s = lolblast(emoj, num || printthismany)
+	console.log(s)
+}
+else {
+	s = lolblast(lol, num || printthismany)
+	console.log("-l satan -n 254")
+}
+console.log(s)
+
+/*
+exec("termux-clipboard-set " + s, (error, stdout, stderr) => {
+		console.log(stdout)
+})
+*/
+
+// RANDO
+
+function rando (amount) {
+	i = 0
+	outstring = ""
+	/*
+	let reduced = hrefs.reduce(function(filtered, href) {
+        if (regexValidURL.test(href) && !regexSkip.test(href)) {
+            filtered.push(href)
+        }
+        return filtered
+    	}, [])
+    */
+	while (i < amount) {
+    		emoji = lolset[Math.floor(Math.random() * lolset.length)]
+		outstring += ":" + emoji + ":"
+		i++
+	}
+	return outstring
+
+}
+
+// LOLBLAST
+
+function lolblast(emoji, amount) {
+	i = 0
+	outstring = ""
+	while (i < amount) {
+			//process.stdout.write(`:lol:`)
+			outstring += ":" + emoji + ":"
+		i++
+	}
+	return outstring
+}

@@ -6,11 +6,6 @@ echo "SCRIPT_DIR: $SCRIPT_DIR"
 
 URLS_STREAM=$(cat $SCRIPT_DIR/mjrp3.json | jq .[][] | tr -d '"')
 readarray -t urls <<<"$URLS_STREAM" 
-#urls=($urlBeachyThang, $urlHarborBk, $urlBklnBrdg, $urlLaGrangeKY, $urlAshlandVA, $urlFairportNY, $urlDeerFieldBeachPierFL, $urlMauiWhalerCondo, $urlTimesSquareNY, $urlMontereyAquarium, $urlLeavenworthWA)
-
-# Bryant Park seems to be broken at our resolution 
-#'https://youtu.be/watch?v=srlpC5tmhYs'\
-#urls=('https://youtu.be/watch?v=srlpC5tmhYs')
 
 randindex="$(expr $RANDOM % ${#urls[@]})"
 echo "DBH RANDINDEX : $randindex"
@@ -18,4 +13,5 @@ echo "DBH RANDINDEX : $randindex"
 randurl=${urls[${randindex}]}
 echo "DBG RANDURL : $randurl"
 
-vlc --fullscreen $randurl | tee $HOME/log/mjrp3manual.log
+#vlc --fullscreen $randurl | tee $HOME/log/mjrp3manual.log
+cvlc --fullscreen $randurl | tee $HOME/log/mjrp3manual.log
