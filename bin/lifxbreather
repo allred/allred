@@ -1,0 +1,48 @@
+#!/usr/bin/env node
+//const https = require('https')
+const request = require('request')
+let url_base = 'https://api.lifx.com/v1/lights'
+
+
+
+url_req = url_base + "/all"
+let options = {json: true, headers: {'Authorization': 'Bearer ' + process.env.LIFX_TOKEN}}
+console.log('url: ' + url_req)
+request(url_req, options, (err, res, body) => {
+    if (err) {
+        console.log("err: " + err)
+    }
+	body.forEach(element => {
+		breathe(element.label)
+    })
+})
+
+function breathe(label) {
+	url_req = url_base + "/label:" + label + "/effects/breathe"
+	console.log(url_req)
+	request(url_req, {...options, ...{method: 'POST', body: {"color": "red"}}}, (err, res, body) => {
+     	if (err) {
+        	console.log("ERR: " + err)
+    	}
+		console.log(body)
+	})
+}
+
+
+
+/*
+const sdk = require('api')('https://api.developer.lifx.com/openapi/63053fd59807941f67a92dcb')
+//const sdk = require('api')('https://api.developer.lifx.com/openapi/' + process.env.LIFX_TOKEN);
+
+sdk.listLights({selector: 'selector'})
+  .then(({ data }) => console.log(data))
+  .catch(err => console.error(err));
+*/
+
+/*
+https.get(url_base + "/all", (res) => {
+    console.log(res)
+    //res.on('dadta'
+})
+*/
+
