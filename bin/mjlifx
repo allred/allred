@@ -1,0 +1,20 @@
+#!/bin/bash
+# minimal client for lifx api
+cat <<EOF
+usage:
+       $0 label:westbed/state power=on color=blue fast:=true"
+       $0 label:eastbed/toggle"
+       $0 label:westbed/effects/breathe color=red
+
+EOF
+# see also:
+# https://api.developer.lifx.com/reference/set-state
+# brew install httpie
+
+url_base="https://api.lifx.com/v1/lights"
+#method=${1-'PUT'} # there is a better way
+method='POST'
+if [[ $1 =~ .*state.* ]]; then 
+  method='PUT'
+fi
+http -vv $method "$url_base/$1" "Authorization: Bearer $LIFX_TOKEN" $@
