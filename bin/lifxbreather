@@ -19,6 +19,7 @@ request(url_req, options, (err, res, body) => {
 
 function breathe(label) {
 	url_req = url_base + "/label:" + label + "/effects/breathe"
+	//url_req = url_base + "/label:" + label + "/effects/pulse" // scary!
 	console.log(url_req)
 	request(url_req, {...options, ...{method: 'POST', body: {"color": "red"}}}, (err, res, body) => {
      	if (err) {
