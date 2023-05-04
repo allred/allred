@@ -12,9 +12,14 @@ request(url_req, options, (err, res, body) => {
     if (err) {
         console.log("err: " + err)
     }
+    randlight = body[Math.floor(Math.random()*body.length)]
+    console.log(randlight.label)
+    breathe(randlight.label + "")
+    /*
 	body.forEach(element => {
 		breathe(element.label)
     })
+    */
 })
 
 function breathe(label) {
