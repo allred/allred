@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-//const https = require('https')
+// "breathes" a random light
+// you will need to set the LIFX_TOKEN env variable
 const request = require('request')
 let url_base = 'https://api.lifx.com/v1/lights'
-
 
 
 url_req = url_base + "/all"
@@ -26,7 +26,12 @@ function breathe(label) {
 	url_req = url_base + "/label:" + label + "/effects/breathe"
 	//url_req = url_base + "/label:" + label + "/effects/pulse" // scary!
 	console.log(url_req)
-	request(url_req, {...options, ...{method: 'POST', body: {"color": "red"}}}, (err, res, body) => {
+	request(url_req, {...options, ...{method: 'POST', body: {
+        "power": "on",
+        "color": "blue",
+        "brightness": 0.1,
+        //"duration": 3,
+    }}}, (err, res, body) => {
      	if (err) {
         	console.log("ERR: " + err)
     	}
