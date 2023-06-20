@@ -1,0 +1,56 @@
+#!/usr/bin/env node
+// first authorize the app in a browser
+const axios = require('axios')
+let FormData = require('form-data') 
+//let url = 'https://mastodon.world/api/v2/search?q=wordle&type=hashtags&limit=1'
+//let url = 'https://mastodon.world/api/v2/search?q=reddit&type=statuses&limit=1'
+let urlBase = 'https://mastodon.world/api/v2'
+
+function main() {
+    //authorize()
+    oauthToken()
+}
+main()
+
+function oauthToken() {
+    let qParams = {
+        "grant_type": "authorization_code",
+        "client_id": process.env.MASTODON_CLIENT_KEY,
+        "client_secret": process.env.MASTODON_CLIENT_SECRET,
+        "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+        "code": process.env.MASTODON_AUTH_CODE,
+        "scope": "read write push",
+    }
+    const form = new FormData()
+    form.append("grant_type", "authorization_code")
+    form.append("client_id", process.env.MASTODON_CLIENT_KEY)
+    form.append("client_secret", process.env.MASTODON_CLIENT_SECRET)
+    form.append("redirect_uri", "urn:ietf:wg:oauth:2.0:oob")
+    form.append("code", process.env.MASTODON_AUTH_CODE)
+    //form.append("scope", "read write push")
+    console.log(form)
+
+    axios.post("https://mastodon.world/oauth/token", form).then(function(response) {
+	    //console.log(response)
+	    console.log(response.data)
+    }).catch(function(error) {
+	    console.log(error)
+    })
+}
+
+function authorize() {
+    let qParams = {
+        "client_id": process.env.MASTODON_CLIENT_KEY,
+        "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+        "response_type": "code",
+    }
+
+    axios.get("https://mastodon.world/oauth/authorize", { params: qParams }).then(function(response) {
+	    //console.log(response)
+	    console.log(response.data)
+    }).catch(function(error) {
+	    console.log(error)
+    })
+}
+
+// curl $url | jq .
