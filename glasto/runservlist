@@ -1,0 +1,3 @@
+#!/bin/bash
+outdir=$HOME/s/mikeallred.com/pub/mastodon
+timeout 24h $HOME/gits/allred/glasto/servlist.py | tee > $outdir/index.tmp && cp -p $outdir/index.tmp $outdir/index.html
