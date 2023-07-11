@@ -4,7 +4,7 @@ import platform
 import pprint
 import subprocess
 from mastodon import Mastodon
-#os.environ.set("PYTHONUNBUFFED", 1)
+#os.environ.set("PYTHONUNBUFFERED", 1)
 
 
 pp = pprint.PrettyPrinter(indent=4)
@@ -41,7 +41,7 @@ def ping(host):
 #pp.pprint(sorted(servlist))
 if __name__ == "__main__":
     print(f""" <html> <head> <title>List of Mastodon Servers Status</title> <body> """)
-    for s in servlist:
+    for s in sorted(servlist):
         comprocess = ping(s)
         if comprocess.returncode == 0:
             print(f'<div><a href="http://{s}">{s}</a></div>')
