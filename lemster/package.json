@@ -1,0 +1,15 @@
+{
+  "name": "lemster",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lemmy-js-client": "^0.18.3-rc.2"
+  }
+}
